@@ -7,9 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
+
 public class LoginScreen extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
+    private JButton loginButton;
 
     public LoginScreen() {
         setTitle("Doctors' System");
@@ -31,6 +34,7 @@ public class LoginScreen extends JFrame {
         panel.add(userLabel);
 
         usernameField = new JTextField(20);
+        usernameField.setName("usernameField"); // Set a unique name
         usernameField.setBounds(100, 20, 165, 25);
         panel.add(usernameField);
 
@@ -39,10 +43,12 @@ public class LoginScreen extends JFrame {
         panel.add(passwordLabel);
 
         passwordField = new JPasswordField(20);
+        passwordField.setName("passwordField"); // Set a unique name
         passwordField.setBounds(100, 50, 165, 25);
         panel.add(passwordField);
 
-        JButton loginButton = new JButton("Login");
+        loginButton = new JButton("Login");
+        loginButton.setName("loginButton"); // Set a unique name
         loginButton.setBounds(10, 80, 80, 25);
         panel.add(loginButton);
 
@@ -53,8 +59,8 @@ public class LoginScreen extends JFrame {
                 String password = new String(passwordField.getPassword());
                 if (validateLogin(username, password)) {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Login Successful!");
-                    new DoctorDashboard(); 
-                    dispose(); 
+                    new DoctorDashboard();
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Invalid username or password.");
                 }
