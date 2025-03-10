@@ -10,18 +10,37 @@ class DoctorDashboardTest {
 
         DoctorDashboard dashboard = new DoctorDashboard();
 
-        // Simulate entering a month and year
-        setTextFieldText(dashboard, "monthField", "10");
-        setTextFieldText(dashboard, "yearField", "2023");
+        // Simulate entering a valid date and time
+        setTextFieldText(dashboard, "dateField", "2023-10-15");
+        setTextFieldText(dashboard, "timeField", "10:00");
 
 
         clickViewBookingsButton(dashboard);
 
-        // Assert
+
         // Verify that the bookings area is updated with the correct data
         JTextArea bookingsArea = findTextArea(dashboard);
         assertNotNull(bookingsArea, "Bookings area should not be null.");
-        assertEquals("Booking 1: 2023-10-15 10:00 AM\nBooking 2: 2023-10-20 02:00 PM", bookingsArea.getText(), "Bookings area should display the correct bookings.");
+        assertTrue(bookingsArea.getText().contains("Booking Found:"), "Bookings area should display booking details.");
+    }
+
+    @Test
+    void testViewBookingsButton_NoBookingFound() {
+
+        DoctorDashboard dashboard = new DoctorDashboard();
+
+        // Simulate entering a date and time with no bookings
+        setTextFieldText(dashboard, "dateField", "2023-10-16");
+        setTextFieldText(dashboard, "timeField", "10:00");
+
+
+        clickViewBookingsButton(dashboard);
+
+
+        // Verify that the bookings area displays "No booking found"
+        JTextArea bookingsArea = findTextArea(dashboard);
+        assertNotNull(bookingsArea, "Bookings area should not be null.");
+        assertTrue(bookingsArea.getText().contains("No booking found"), "Bookings area should display 'No booking found'.");
     }
 
     @Test
@@ -29,18 +48,18 @@ class DoctorDashboardTest {
 
         DoctorDashboard dashboard = new DoctorDashboard();
 
-        // Simulate entering invalid month and year
-        setTextFieldText(dashboard, "monthField", "invalid");
-        setTextFieldText(dashboard, "yearField", "invalid");
+        // Simulate entering invalid date and time
+        setTextFieldText(dashboard, "dateField", "invalid-date");
+        setTextFieldText(dashboard, "timeField", "invalid-time");
 
 
         clickViewBookingsButton(dashboard);
 
 
-        // Verify that the bookings area is not updated (or shows an error message)
+        // Verify that the bookings area displays an error message
         JTextArea bookingsArea = findTextArea(dashboard);
         assertNotNull(bookingsArea, "Bookings area should not be null.");
-        assertTrue(bookingsArea.getText().isEmpty(), "Bookings area should be empty for invalid input.");
+        assertTrue(bookingsArea.getText().contains("Error retrieving data"), "Bookings area should display an error message.");
     }
 
     // Helper method to set text in a JTextField
@@ -54,15 +73,15 @@ class DoctorDashboardTest {
         fail("JTextField with name " + fieldName + " not found.");
     }
 
-    // Helper method to click the "View Bookings" button
+    // Helper method to click the "Find Booking" button
     private void clickViewBookingsButton(DoctorDashboard dashboard) {
         for (Component component : dashboard.getContentPane().getComponents()) {
-            if (component instanceof JButton && "View Bookings".equals(((JButton) component).getText())) {
+            if (component instanceof JButton && "Find Booking".equals(((JButton) component).getText())) {
                 ((JButton) component).doClick();
                 return;
             }
         }
-        fail("View Bookings button not found.");
+        fail("Find Booking button not found.");
     }
 
     // Helper method to find the JTextArea
