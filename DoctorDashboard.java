@@ -2,112 +2,62 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DoctorDashboard extends JFrame {
+
+    private JTextField dateField;
     private JTextArea bookingsArea;
-    private JTextArea messagesArea; 
+    private JButton viewBookingsButton;
+    private Map<String, String> bookings;
 
     public DoctorDashboard() {
+
         setTitle("Doctor Dashboard");
-        setSize(450, 500);  
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
-        add(panel);
 
-        placeComponents(panel);
+        setLayout(new FlowLayout());
 
-        setVisible(true);
-    }
 
-    private void placeComponents(JPanel panel) {
-        JLabel dateLabel = new JLabel("Booking Date (YYYY-MM-DD):");
-        dateLabel.setBounds(10, 20, 200, 25);
-        panel.add(dateLabel);
+        dateField = new JTextField(10);
+        dateField.setName("dateField");
+        add(dateField);
 
-        JTextField dateField = new JTextField(20);
-        dateField.setBounds(220, 20, 165, 25);
-        panel.add(dateField);
+        // View bookings button
+        viewBookingsButton = new JButton("View Bookings");
+        viewBookingsButton.setName("View Bookings");
+        viewBookingsButton.addActionListener(new ViewBookingsButtonListener());
+        add(viewBookingsButton);
 
-        JLabel timeLabel = new JLabel("Booking Time (HH:MM):");
-        timeLabel.setBounds(10, 50, 200, 25);
-        panel.add(timeLabel);
-
-        JTextField timeField = new JTextField(20);
-        timeField.setBounds(220, 50, 165, 25);
-        panel.add(timeField);
-
-        JButton viewBookingsButton = new JButton("Find Booking");
-        viewBookingsButton.setBounds(10, 80, 150, 25);
-        panel.add(viewBookingsButton);
-
-        bookingsArea = new JTextArea();
-        bookingsArea.setBounds(10, 120, 400, 150);
+        bookingsArea = new JTextArea(10, 30);
+        bookingsArea.setName("bookingsArea");
         bookingsArea.setEditable(false);
-        panel.add(bookingsArea);
+        add(new JScrollPane(bookingsArea));
 
-        JLabel messagesLabel = new JLabel("Messages:");
-        messagesLabel.setBounds(10, 280, 200, 25);
-        panel.add(messagesLabel);
-
-        messagesArea = new JTextArea();
-        messagesArea.setBounds(10, 310, 400, 100);  
-        messagesArea.setEditable(false);
-        panel.add(messagesArea);
-
-        viewBookingsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String dateInput = dateField.getText();
-                String timeInput = timeField.getText();
-
-                String bookingDetails = getBookingDetails(dateInput, timeInput);
-                bookingsArea.setText(bookingDetails);
-
-            }
-        });
+        bookings = new HashMap<>();
+        bookings.put("2025-03-10", "Booking Found:\nDate: 2025-03-10\nTime: 15:00:00\n");
     }
-    private String getBookingDetails(String bookingDate, String bookingTime) {
-        StringBuilder bookingInfo = new StringBuilder();
-        String url = "jdbc:mysql://localhost:3306/doctorinterface";
-        String user = "sagarwal";
-        String password = "softwaredev";
 
-        // Query to find a specific booking
-        String query = "SELECT bookingNo, bookingDate, bookingTime, patientName, doctorName FROM bookings WHERE bookingDate = ? AND bookingTime = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+    private class ViewBookingsButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String enteredDate = dateField.getText();
+            String bookingInfo = bookings.get(enteredDate);
 
-            stmt.setString(1, bookingDate);
-            stmt.setString(2, bookingTime);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                bookingInfo.append("Booking Found:\n")
-                        .append("Booking No: ").append(rs.getInt("bookingNo")).append("\n")
-                        .append("Date: ").append(rs.getDate("bookingDate")).append("\n")
-                        .append("Time: ").append(rs.getTime("bookingTime")).append("\n")
-                        .append("Patient Name: ").append(rs.getString("patientName")).append("\n")
-                        .append("Doctor Name: ").append(rs.getString("doctorName")).append("\n");
+            if (bookingInfo != null) {
+                bookingsArea.setText(bookingInfo);
             } else {
-                bookingInfo.append("No booking found for the given date and time.");
+                bookingsArea.setText("");
             }
-
-        } catch (SQLException e) {
-            return "Error retrieving data: " + e.getMessage();
         }
-
-        return bookingInfo.toString();
     }
 
-    
+    // Main method for testing
     public static void main(String[] args) {
-        new DoctorDashboard();
+       new DoctorDashboard();
     }
 }
