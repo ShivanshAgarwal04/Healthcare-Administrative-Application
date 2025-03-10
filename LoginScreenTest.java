@@ -7,34 +7,34 @@ class LoginScreenTest {
 
     @Test
     void testLoginButton_Success() {
-        // Arrange
+
         LoginScreen loginScreen = new LoginScreen();
 
         // Simulate entering a username and password
         setTextFieldText(loginScreen, "usernameField", "validUser");
         setPasswordFieldText(loginScreen, "passwordField", "validPassword");
 
-        // Act
+
         clickLoginButton(loginScreen);
 
-        // Assert
+
         // Verify that the login screen closes after successful login
         assertFalse(loginScreen.isVisible(), "Login screen should close after successful login.");
     }
 
     @Test
     void testLoginButton_Failure_WrongPassword() {
-        // Arrange
+
         LoginScreen loginScreen = new LoginScreen();
 
         // Simulate entering a username and incorrect password
         setTextFieldText(loginScreen, "usernameField", "validUser");
         setPasswordFieldText(loginScreen, "passwordField", "wrongPassword");
 
-        // Act
+
         clickLoginButton(loginScreen);
 
-        // Assert
+
         // Verify that an error dialog is displayed
         JOptionPane errorDialog = getErrorDialog(loginScreen);
         assertNotNull(errorDialog, "An error dialog should be displayed for incorrect password.");
@@ -43,17 +43,17 @@ class LoginScreenTest {
 
     @Test
     void testLoginButton_Failure_UserNotFound() {
-        // Arrange
+
         LoginScreen loginScreen = new LoginScreen();
 
         // Simulate entering a non-existent username and password
         setTextFieldText(loginScreen, "usernameField", "nonExistentUser");
         setPasswordFieldText(loginScreen, "passwordField", "testPassword");
 
-        // Act
+
         clickLoginButton(loginScreen);
 
-        // Assert
+
         // Verify that an error dialog is displayed
         JOptionPane errorDialog = getErrorDialog(loginScreen);
         assertNotNull(errorDialog, "An error dialog should be displayed for non-existent user.");
