@@ -27,7 +27,7 @@ class LoginScreenTest {
 
         LoginScreen loginScreen = new LoginScreen();
 
-        // Simulate entering a username and incorrect password
+        // Entering wrong details to test if the system recognises invalid credentials
         setTextFieldText(loginScreen, "usernameField", "validUser");
         setPasswordFieldText(loginScreen, "passwordField", "wrongPassword");
 
@@ -35,7 +35,7 @@ class LoginScreenTest {
         clickLoginButton(loginScreen);
 
 
-        // Verify that an error dialog is displayed
+        // Confirms if the dialog box is displayed or not.
         JOptionPane errorDialog = getErrorDialog(loginScreen);
         assertNotNull(errorDialog, "An error dialog should be displayed for incorrect password.");
         assertEquals("Invalid username or password.", errorDialog.getMessage(), "Error message should match.");
@@ -46,7 +46,7 @@ class LoginScreenTest {
 
         LoginScreen loginScreen = new LoginScreen();
 
-        // Simulate entering a non-existent username and password
+        // Entering wrong details to test if the system recognises invalid credentials
         setTextFieldText(loginScreen, "usernameField", "nonExistentUser");
         setPasswordFieldText(loginScreen, "passwordField", "testPassword");
 
@@ -54,13 +54,13 @@ class LoginScreenTest {
         clickLoginButton(loginScreen);
 
 
-        // Verify that an error dialog is displayed
+        // Confirms that the dialog is displayed
         JOptionPane errorDialog = getErrorDialog(loginScreen);
         assertNotNull(errorDialog, "An error dialog should be displayed for non-existent user.");
         assertEquals("Invalid username or password.", errorDialog.getMessage(), "Error message should match.");
     }
 
-    // Helper method to set text in a JTextField
+    // Helper method 
     private void setTextFieldText(LoginScreen loginScreen, String fieldName, String text) {
         Component component = findComponentByName(loginScreen, fieldName);
         if (component instanceof JTextField) {
@@ -70,7 +70,7 @@ class LoginScreenTest {
         }
     }
 
-    // Helper method to set text in a JPasswordField
+    // Helper method
     private void setPasswordFieldText(LoginScreen loginScreen, String fieldName, String text) {
         Component component = findComponentByName(loginScreen, fieldName);
         if (component instanceof JPasswordField) {
@@ -80,7 +80,7 @@ class LoginScreenTest {
         }
     }
 
-    // Helper method to click the login button
+    // Helper method
     private void clickLoginButton(LoginScreen loginScreen) {
         Component component = findComponentByName(loginScreen, "loginButton");
         if (component instanceof JButton) {
@@ -90,7 +90,7 @@ class LoginScreenTest {
         }
     }
 
-    // Helper method to find a component by name
+    // Helper method 
     private Component findComponentByName(LoginScreen loginScreen, String name) {
         for (Component component : loginScreen.getContentPane().getComponents()) {
             if (name.equals(component.getName())) {
@@ -100,7 +100,7 @@ class LoginScreenTest {
         return null;
     }
 
-    // Helper method to get the error dialog
+    // Helper method 
     private JOptionPane getErrorDialog(LoginScreen loginScreen) {
         for (Window window : Window.getWindows()) {
             if (window instanceof JDialog) {
