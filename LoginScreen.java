@@ -32,6 +32,7 @@ public class LoginScreen extends JFrame {
 
         usernameField = new JTextField(20);
         usernameField.setBounds(100, 20, 165, 25);
+        usernameField.setName("usernameField");  // Set the name for testing
         panel.add(usernameField);
 
         JLabel passwordLabel = new JLabel("Password:");
@@ -40,10 +41,12 @@ public class LoginScreen extends JFrame {
 
         passwordField = new JPasswordField(20);
         passwordField.setBounds(100, 50, 165, 25);
+        passwordField.setName("passwordField");  // Set the name for testing
         panel.add(passwordField);
 
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(10, 80, 80, 25);
+        loginButton.setName("loginButton");  // Set the name for testing
         panel.add(loginButton);
 
         loginButton.addActionListener(new ActionListener() {
@@ -53,8 +56,8 @@ public class LoginScreen extends JFrame {
                 String password = new String(passwordField.getPassword());
                 if (validateLogin(username, password)) {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Login Successful!");
-                    new DoctorDashboard(); // this open the doctors dashboard
-                    dispose(); // this part closes the login screen and disposes it away
+                    new DoctorDashboard(); // this opens the doctor's dashboard
+                    dispose(); // close and dispose of the login screen
                 } else {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Invalid username or password.");
                 }
@@ -62,7 +65,7 @@ public class LoginScreen extends JFrame {
         });
     }
 
-   private boolean validateLogin(String username, String password) {
+    private boolean validateLogin(String username, String password) {
         boolean isValid = false;
         String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
@@ -87,7 +90,6 @@ public class LoginScreen extends JFrame {
 
         return isValid;
     }
-
 
     public static void main(String[] args) {
         new LoginScreen();
