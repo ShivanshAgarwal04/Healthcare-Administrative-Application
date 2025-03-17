@@ -1,63 +1,85 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.*;
 
 public class DoctorDashboard extends JFrame {
-
-    private JTextField dateField;
+    public  JTextField dateField;
     private JTextArea bookingsArea;
-    private JButton viewBookingsButton;
-    private Map<String, String> bookings;
 
     public DoctorDashboard() {
-
         setTitle("Doctor Dashboard");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        JPanel panel = new JPanel();
+        add(panel);
+        placeComponents(panel);
 
-        setLayout(new FlowLayout());
-
-
-        dateField = new JTextField(10);
-        dateField.setName("dateField");
-        add(dateField);
-
-        // View bookings button
-        viewBookingsButton = new JButton("View Bookings");
-        viewBookingsButton.setName("View Bookings");
-        viewBookingsButton.addActionListener(new ViewBookingsButtonListener());
-        add(viewBookingsButton);
-
-        bookingsArea = new JTextArea(10, 30);
-        bookingsArea.setName("bookingsArea");
-        bookingsArea.setEditable(false);
-        add(new JScrollPane(bookingsArea));
-
-        bookings = new HashMap<>();
-        bookings.put("2025-03-10", "Booking Found:\nDate: 2025-03-10\nTime: 15:00:00\n");
+        setVisible(true);
     }
 
+    private void placeComponents(JPanel panel) {
+        panel.setLayout(null);
 
-    private class ViewBookingsButtonListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String enteredDate = dateField.getText();
-            String bookingInfo = bookings.get(enteredDate);
+        JLabel dateLabel = new JLabel("Enter Date (YYYY-MM):");
+        dateLabel.setBounds(10, 20, 160, 25);
+        panel.add(dateLabel);
 
-            if (bookingInfo != null) {
-                bookingsArea.setText(bookingInfo);
-            } else {
-                bookingsArea.setText("");
+        dateField = new JTextField(20);
+        dateField.setBounds(180, 20, 165, 25);
+        panel.add(dateField);
+
+        JButton viewBookingsButton = new JButton("View Bookings");
+        viewBookingsButton.setBounds(10, 60, 150, 25);
+        viewBookingsButton.setName("View Bookings");  // Set name for testing
+        panel.add(viewBookingsButton);
+
+        bookingsArea = new JTextArea();
+        bookingsArea.setBounds(10, 100, 350, 150);
+        bookingsArea.setName("bookingsArea");  // Set name for testing
+        panel.add(bookingsArea);
+
+        viewBookingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = dateField.getText();
+                viewBookings(date);
             }
+        });
+    }
+
+    private void viewBookings(String date) {
+        String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String query = "SELECT bookingDate, bookingTime, patientName, doctorName FROM bookings WHERE bookingDate = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1, date);
+
+            ResultSet resultSet2 = statement.executeQuery();
+
+            if (resultSet2.next()) {
+                String bookingDate = resultSet2.getString("bookingDate");
+                String bookingTime = resultSet2.getString("bookingTime");
+                String patientName = resultSet2.getString("patientName");
+                String doctorName = resultSet2.getString("doctorName");
+
+
+                bookingsArea.setText("Booking Found:\n" +
+                        "Date: " + bookingDate + "\n" +
+                        "Time: " + bookingTime + "\n" +
+                        "Patient: " + patientName + "\n" +
+                        "Doctor: " + doctorName);
+            } else {
+                bookingsArea.setText("No bookings found for the searched date");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    // Main method for testing
     public static void main(String[] args) {
-       new DoctorDashboard();
+        new DoctorDashboard();
     }
 }
