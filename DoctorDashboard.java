@@ -78,7 +78,12 @@ public class DoctorDashboard extends JFrame {
             e.printStackTrace();
         }
     }
+    private void viewPatients (String data){
 
+    }
+    private void enterVisitDetailsPrescriptions(String data){
+
+    }
     public static void main(String[] args) {
         new DoctorDashboard();
     }
