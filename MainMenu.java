@@ -51,7 +51,7 @@ public class MainMenu extends JFrame {
         enterDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // button should direct for enter visit details once
+                new EnterDetails();
             }
         });
     }
