@@ -19,12 +19,17 @@ public class MainMenu extends JFrame {
 
     private void placeComponents(JPanel panel2) {
         JButton viewBookings = new JButton("Bookings");
-        viewBookings.setBounds(10, 40, 150, 25);
+        viewBookings.setBounds(10, 40, 250, 25);
         viewBookings.setName("viewBookings");
         panel2.add(viewBookings);
 
+        JButton enterDetailsButton = new JButton("Enter visit details and prescriptions");
+        enterDetailsButton.setBounds(10,60,250,25);
+        enterDetailsButton.setName("Enter details");
+        panel2.add(enterDetailsButton);
+
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBounds(10, 80, 150, 25);
+        logoutButton.setBounds(10, 80, 250, 25);
         logoutButton.setName("logoutButton");
         panel2.add(logoutButton);
 
@@ -40,6 +45,13 @@ public class MainMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 new LoginScreen();
+            }
+        });
+
+        enterDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // button should direct for enter visit details once
             }
         });
     }
