@@ -15,7 +15,7 @@ public class EnterDetails extends JFrame
 
         setVisible(true);
     }
-    private void placeComponents(JPanel panel){
+    private void placeComponents(JPanel panel) {
         JButton enterPrescriptionsButton = new JButton("Enter prescriptions");
         enterPrescriptionsButton.setBounds(10, 60, 150, 25);
         enterPrescriptionsButton.setName("Enter prescriptions ");
@@ -38,6 +38,7 @@ public class EnterDetails extends JFrame
                 new EnterPrescriptions();
             }
         });
+    }
 }
 
 class EnterPrescriptions extends JFrame {
@@ -76,6 +77,6 @@ class EnterVisitDetails extends JFrame {
 
     }
 }
-}
+
 
 
