@@ -53,24 +53,34 @@ public class DoctorDashboard extends JFrame {
         String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
         try (Connection conn = DriverManager.getConnection(url)) {
-            String query = "SELECT bookingDate, bookingTime, patientName, doctorName FROM bookings WHERE bookingDate = ?";
+            String query = "SELECT * FROM bookings WHERE yearOfBooking = ? AND monthOfBooking = ?";
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, date);
 
             ResultSet resultSet2 = statement.executeQuery();
 
-            if (resultSet2.next()) {
-                String bookingDate = resultSet2.getString("bookingDate");
-                String bookingTime = resultSet2.getString("bookingTime");
-                String patientName = resultSet2.getString("patientName");
-                String doctorName = resultSet2.getString("doctorName");
+            while (resultSet.next()) {
+                found = true;
+                String dayOfBooking = resultSet.getString("dayOfBooking");
+                String monthOfBooking = resultSet.getString("monthOfBooking");
+                String yearOfBooking = resultSet.getString("yearOfBooking");
+                String bookingTime = resultSet.getString("bookingTime");
+                String patientName = resultSet.getString("patientName");
+                String doctorName = resultSet.getString("doctorName");
 
+                // Combine the day, month, and year columns to form the complete booking date
+                String calendarDate = dayOfBooking + "-" + monthOfBooking + "-" + yearOfBooking;
 
-                bookingsArea.setText("Booking Found:\n" +
-                        "Date: " + bookingDate + "\n" +
-                        "Time: " + bookingTime + "\n" +
-                        "Patient: " + patientName + "\n" +
-                        "Doctor: " + doctorName);
+                // Append booking details to the text area
+                bookingsText.append("Date: ").append(calendarDate)
+                        .append("\nTime: ").append(bookingTime)
+                        .append("\nPatient: ").append(patientName)
+                        .append("\nDoctor: ").append(doctorName)
+                        .append("\n------------------\n");
+            }
+            // Display the result or show a message if no bookings are found
+            if (found) {
+                bookingsArea.setText(bookingsText.toString());
             } else {
                 bookingsArea.setText("No bookings found for the searched date");
             }
