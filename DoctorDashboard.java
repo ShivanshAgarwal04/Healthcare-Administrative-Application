@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 
 public class DoctorDashboard extends JFrame {
-    public  JTextField dateField;
+    public JTextField dateField;
     private JTextArea bookingsArea;
 
     public DoctorDashboard() {
@@ -32,16 +32,10 @@ public class DoctorDashboard extends JFrame {
 
         JButton viewBookingsButton = new JButton("View Bookings");
         viewBookingsButton.setBounds(10, 60, 150, 25);
-        viewBookingsButton.setName("View Bookings");  // Set name for testing
         panel.add(viewBookingsButton);
-
-        JButton viewPatientsButton = new JButton("View Patients");
-        viewPatientsButton.setBounds(180, 60, 150, 25);
-        panel.add(viewPatientsButton);
 
         bookingsArea = new JTextArea();
         bookingsArea.setBounds(10, 100, 350, 150);
-        bookingsArea.setName("bookingsArea");  // Set name for testing
         panel.add(bookingsArea);
 
         viewBookingsButton.addActionListener(new ActionListener() {
@@ -51,37 +45,50 @@ public class DoctorDashboard extends JFrame {
                 viewBookings(date);
             }
         });
-        viewPatientsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                viewPatients();
-            }
-        });
-
     }
 
     private void viewBookings(String date) {
+        // Extract year and month from input (YYYY-MM)
+        String year = date.substring(0, 4);  // Extract year (YYYY)
+        String month = date.substring(5, 7); // Extract month (MM)
+
         String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
         try (Connection conn = DriverManager.getConnection(url)) {
-            String query = "SELECT bookingDate, bookingTime, patientName, doctorName FROM bookings WHERE bookingDate = ?";
+            // Query to fetch all bookings matching the year and month
+            String query = "SELECT dayOfBooking, monthOfBooking, yearOfBooking, bookingTime, patientName, doctorName " +
+                    "FROM bookings WHERE yearOfBooking = ? AND monthOfBooking = ?";
             PreparedStatement statement = conn.prepareStatement(query);
-            statement.setString(1, date);
+            statement.setString(1, year);
+            statement.setString(2, month);
 
-            ResultSet resultSet2 = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
-            if (resultSet2.next()) {
-                String bookingDate = resultSet2.getString("bookingDate");
-                String bookingTime = resultSet2.getString("bookingTime");
-                String patientName = resultSet2.getString("patientName");
-                String doctorName = resultSet2.getString("doctorName");
+            StringBuilder bookingsText = new StringBuilder();
+            boolean found = false;
 
+            while (resultSet.next()) {
+                found = true;
+                String dayOfBooking = resultSet.getString("dayOfBooking");
+                String monthOfBooking = resultSet.getString("monthOfBooking");
+                String yearOfBooking = resultSet.getString("yearOfBooking");
+                String bookingTime = resultSet.getString("bookingTime");
+                String patientName = resultSet.getString("patientName");
+                String doctorName = resultSet.getString("doctorName");
 
-                bookingsArea.setText("Booking Found:\n" +
-                        "Date: " + bookingDate + "\n" +
-                        "Time: " + bookingTime + "\n" +
-                        "Patient: " + patientName + "\n" +
-                        "Doctor: " + doctorName);
+                // Combining the day, month, and year columns
+                String calendarDate = dayOfBooking + "-" + monthOfBooking + "-" + yearOfBooking;
+
+                // Add the results to the text area
+                bookingsText.append("Date: ").append(calendarDate)
+                        .append("\nTime: ").append(bookingTime)
+                        .append("\nPatient: ").append(patientName)
+                        .append("\nDoctor: ").append(doctorName)
+                        .append("\n------------------\n");
+            }
+
+            if (found) {
+                bookingsArea.setText(bookingsText.toString());
             } else {
                 bookingsArea.setText("No bookings found for the searched date");
             }
@@ -89,36 +96,7 @@ public class DoctorDashboard extends JFrame {
             e.printStackTrace();
         }
     }
-    private void viewPatients() {
-        String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            String query = "SELECT patientID, patientName, phoneNo, email FROM Patients";
-            PreparedStatement statement = conn.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            StringBuilder result = new StringBuilder("Patient List:\n");
-            while (resultSet.next()) {
-                result.append("ID: ").append(resultSet.getInt("patientID"))
-                        .append(", Name: ").append(resultSet.getString("patientName"))
-                        .append(", Phone: ").append(resultSet.getString("phoneNo"))
-                        .append(", Email: ").append(resultSet.getString("email"))
-                        .append("\n");
-            }
-
-            if (result.length() == 13) {
-                bookingsArea.setText("No patients found.");
-            } else {
-                bookingsArea.setText(result.toString());
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void enterVisitDetailsPrescriptions(String data){
-
-    }
     public static void main(String[] args) {
         new DoctorDashboard();
     }
