@@ -27,7 +27,9 @@ CREATE TABLE doctorcredentials (
 -- Bookings table linked to patients and doctors
 CREATE TABLE Bookings (
     bookingNo INT PRIMARY KEY,
-    bookingDate DATE DEFAULT NULL,
+    dayOfBooking INT NOT NULL,
+    monthOfBooking INT NOT NULL,
+    yearOfBooking YEAR NOT NULL,
     bookingTime TIME DEFAULT NULL,
     patientID INT,
     doctorID INT,
