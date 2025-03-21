@@ -9,7 +9,7 @@ public class MainMenu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel2 = new JPanel();
-        panel2.setLayout(null); // Ensure absolute positioning
+        panel2.setLayout(null); // Absolute positioning
         add(panel2);
 
         placeComponents(panel2);
@@ -19,24 +19,32 @@ public class MainMenu extends JFrame {
 
     private void placeComponents(JPanel panel2) {
         JButton viewBookings = new JButton("Bookings");
-        viewBookings.setBounds(10, 40, 250, 25);
+        viewBookings.setBounds(10, 40, 150, 25);
         viewBookings.setName("viewBookings");
         panel2.add(viewBookings);
 
-        JButton enterDetailsButton = new JButton("Enter visit details and prescriptions");
-        enterDetailsButton.setBounds(10,60,250,25);
-        enterDetailsButton.setName("Enter details");
-        panel2.add(enterDetailsButton);
+        JButton enterButton = new JButton("Enter Details");
+        enterButton.setBounds(10, 80, 150, 25); // Position below "Bookings"
+        enterButton.setName("Enter details");
+        panel2.add(enterButton);
 
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBounds(10, 80, 250, 25);
+        logoutButton.setBounds(10, 120, 150, 25); // Adjusted position
         logoutButton.setName("logoutButton");
         panel2.add(logoutButton);
 
+        // Add action listeners
         viewBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new DoctorDashboard();
+            }
+        });
+
+        enterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new EnterDetails(); // Open EnterDetails when clicked
             }
         });
 
@@ -45,13 +53,6 @@ public class MainMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 new LoginScreen();
-            }
-        });
-
-        enterDetailsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new EnterDetails();
             }
         });
     }
