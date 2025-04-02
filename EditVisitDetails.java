@@ -100,13 +100,17 @@ public class EditVisitDetails extends JFrame {
 
     // This method loads the current visit details (notes) and prescription details from the database
     private void loadExistingDetails() {
-        // Load Visit Details (Visit ID)
+        // Load Visit Details (Visit ID) - Get the Booking Number
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT notes FROM Visits WHERE visitID = ?")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT bookingNo, notes FROM Visits WHERE visitID = ?")) {
             stmt.setInt(1, visitID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     notesField.setText(rs.getString("notes"));
+                    int bookingNo = rs.getInt("bookingNo");
+
+                    // Now load Prescription details using the same bookingNo
+                    loadPrescriptionDetails(bookingNo);
                 } else {
                     JOptionPane.showMessageDialog(this, "No visit details found for the given Visit ID.");
                     dispose();
@@ -116,19 +120,22 @@ public class EditVisitDetails extends JFrame {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error loading visit details.");
         }
+    }
 
-        // Load Prescription Details (Prescription ID)
+    // This method loads the current prescription details using bookingNo
+    private void loadPrescriptionDetails(int bookingNo) {
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE prescriptionID = ?")) {
-            stmt.setInt(1, prescriptionID);
+             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE bookingNo = ?")) {
+            stmt.setInt(1, bookingNo);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    prescriptionID = rs.getInt("prescriptionID");
                     medicationField.setText(rs.getString("medicationName"));
                     dosageField.setText(rs.getString("dosage"));
                     durationField.setText(rs.getString("duration"));
                     instructionsField.setText(rs.getString("instructions"));
                 } else {
-                    JOptionPane.showMessageDialog(this, "No prescription details found for the given Prescription ID.");
+                    JOptionPane.showMessageDialog(this, "No prescription details found for the given Booking Number.");
                     dispose();
                 }
             }
