@@ -15,7 +15,7 @@ public class EditVisitDetails extends JFrame {
         this.visitID = visitID;
 
         setTitle("Edit Visit and Prescription Details");
-        setSize(500, 300);
+        setSize(600, 400);  // Increased size for better visibility
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
@@ -29,35 +29,73 @@ public class EditVisitDetails extends JFrame {
     }
 
     private void placeComponents(JPanel panel) {
-        panel.setLayout(new GridLayout(5, 2, 5, 5));
+        // Use GridBagLayout for flexible layout control
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);  // Add some space around components
+        constraints.anchor = GridBagConstraints.WEST;
 
-        // Visit notes
-        panel.add(new JLabel("Edit Visit Notes:"));
-        notesField = new JTextArea(5, 20);
-        panel.add(new JScrollPane(notesField));
+        // Visit notes label and text area
+        JLabel notesLabel = new JLabel("Edit Visit Notes:");
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        panel.add(notesLabel, constraints);
 
-        // Prescription fields
-        panel.add(new JLabel("Medication:"));
+        notesField = new JTextArea(5, 30);  // Adjust size for better visibility
+        JScrollPane scrollPane = new JScrollPane(notesField);
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;  // Make it span across two columns
+        panel.add(scrollPane, constraints);
+
+        // Prescription fields (Medication, Dosage, Duration, Instructions)
+        JLabel medicationLabel = new JLabel("Medication:");
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        panel.add(medicationLabel, constraints);
+
         medicationField = new JTextField(20);
-        panel.add(medicationField);
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        panel.add(medicationField, constraints);
 
-        panel.add(new JLabel("Dosage:"));
-        dosageField = new JTextField(10);
-        panel.add(dosageField);
+        JLabel dosageLabel = new JLabel("Dosage:");
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        panel.add(dosageLabel, constraints);
 
-        panel.add(new JLabel("Duration:"));
-        durationField = new JTextField(10);
-        panel.add(durationField);
+        dosageField = new JTextField(15);
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        panel.add(dosageField, constraints);
 
-        panel.add(new JLabel("Instructions:"));
+        JLabel durationLabel = new JLabel("Duration:");
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        panel.add(durationLabel, constraints);
+
+        durationField = new JTextField(15);
+        constraints.gridx = 1;
+        constraints.gridy = 3;
+        panel.add(durationField, constraints);
+
+        JLabel instructionsLabel = new JLabel("Instructions:");
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        panel.add(instructionsLabel, constraints);
+
         instructionsField = new JTextField(20);
-        panel.add(instructionsField);
+        constraints.gridx = 1;
+        constraints.gridy = 4;
+        panel.add(instructionsField, constraints);
 
         // Update button
         JButton submitButton = new JButton("Update");
         submitButton.addActionListener(e -> updateDetails());
-        panel.add(new JLabel());
-        panel.add(submitButton);
+        constraints.gridx = 1;
+        constraints.gridy = 5;
+        panel.add(submitButton, constraints);
     }
 
     // This method loads the current visit details (notes) and prescription details from the database
