@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 public class MainMenu extends JFrame {
     public MainMenu() {
         setTitle("Doctor Interface: Main Menu");
-        setSize(300, 200);
+        setSize(300, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel2 = new JPanel();
@@ -28,8 +28,13 @@ public class MainMenu extends JFrame {
         enterButton.setName("Enter details");
         panel2.add(enterButton);
 
+        JButton viewDetailsButton = new JButton("View Details");
+        viewDetailsButton.setBounds(10, 120, 150, 25);
+        viewDetailsButton.setName("View details");
+        panel2.add(viewDetailsButton);
+
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBounds(10, 120, 150, 25); // Adjusted position
+        logoutButton.setBounds(10, 160, 150, 25); // Adjusted position
         logoutButton.setName("logoutButton");
         panel2.add(logoutButton);
 
@@ -53,6 +58,13 @@ public class MainMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 new LoginScreen();
+            }
+        });
+
+        viewDetailsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ViewDetails();
             }
         });
     }
