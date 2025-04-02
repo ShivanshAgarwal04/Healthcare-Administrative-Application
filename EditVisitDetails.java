@@ -4,15 +4,15 @@ import java.sql.*;
 
 // Edit Visit Details
 public class EditVisitDetails extends JFrame {
+    private int bookingID;
     private int prescriptionID;
     private int visitID;
     private JTextArea notesField;
     private JTextField medicationField, dosageField, durationField, instructionsField;
 
-    // Constructor to initialize with prescriptionID and visitID
-    public EditVisitDetails(int prescriptionID, int visitID) {
-        this.prescriptionID = prescriptionID;
-        this.visitID = visitID;
+    // Constructor to initialize with bookingID
+    public EditVisitDetails(int bookingID) {
+        this.bookingID = bookingID;
 
         setTitle("Edit Visit and Prescription Details");
         setSize(600, 400);  // Increased size for better visibility
@@ -100,17 +100,38 @@ public class EditVisitDetails extends JFrame {
 
     // This method loads the current visit details (notes) and prescription details from the database
     private void loadExistingDetails() {
-        // Load Visit Details (Visit ID) - Get the Booking Number
+        // First check if the bookingID exists in the Visits table
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT bookingNo, notes FROM Visits WHERE visitID = ?")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT visitID FROM Visits WHERE bookingNo = ?")) {
+            stmt.setInt(1, bookingID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    visitID = rs.getInt("visitID");
+
+                    // Now load the visit details using the visitID
+                    loadVisitDetails();
+
+                    // Now load Prescription details using the same bookingID
+                    loadPrescriptionDetails(bookingID);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No visit found for the given Booking ID.");
+                    dispose();
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error checking booking ID.");
+        }
+    }
+
+    // This method loads the visit details (notes) from the Visits table
+    private void loadVisitDetails() {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT notes FROM Visits WHERE visitID = ?")) {
             stmt.setInt(1, visitID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     notesField.setText(rs.getString("notes"));
-                    int bookingNo = rs.getInt("bookingNo");
-
-                    // Now load Prescription details using the same bookingNo
-                    loadPrescriptionDetails(bookingNo);
                 } else {
                     JOptionPane.showMessageDialog(this, "No visit details found for the given Visit ID.");
                     dispose();
@@ -122,11 +143,11 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // This method loads the current prescription details using bookingNo
-    private void loadPrescriptionDetails(int bookingNo) {
+    // This method loads the current prescription details using bookingID
+    private void loadPrescriptionDetails(int bookingID) {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE bookingNo = ?")) {
-            stmt.setInt(1, bookingNo);
+            stmt.setInt(1, bookingID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     prescriptionID = rs.getInt("prescriptionID");
