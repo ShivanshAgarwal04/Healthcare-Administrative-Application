@@ -39,20 +39,23 @@ CREATE TABLE Bookings (
 
 -- Visit details table linked to bookings
 CREATE TABLE Visits (
-    visitID INT PRIMARY KEY,
+    visitID INT PRIMARY KEY AUTO_INCREMENT,
     bookingNo INT,
-    visitDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
-    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo)
+    prescriptionID INT NULL,
+    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo),
+    FOREIGN KEY (presciptionID) REFERENCES Prescriptions(prescriptionID)
 );
+
 
 -- Prescriptions table connected to visits
 CREATE TABLE Prescriptions (
-    prescriptionID INT PRIMARY KEY,
-    visitID INT,
+    prescriptionID INT PRIMARY KEY AUTO_INCREMENT,
+    bookingNo INT,
     medicationName VARCHAR(100),
     dosage VARCHAR(50),
     duration VARCHAR(50),
     instructions TEXT,
-    FOREIGN KEY (visitID) REFERENCES Visits(visitID)
+    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo)
+
 );

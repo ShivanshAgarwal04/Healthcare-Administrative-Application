@@ -6,12 +6,28 @@ import java.sql.*;
 
 // Database Connection
 class DBConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/clinic";
+    private static final String URL = "jdbc:mysql://localhost:3306/testdb";
     private static final String USER = "root";
-    private static final String PASSWORD = "password";
+    private static final String PASSWORD = "Younm070.306";
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+    public static boolean confirmBookingID(Integer bookingNo){
+        boolean isValid = false;
+
+        try (Connection conn = getConnection();
+             PreparedStatement statement = conn.prepareStatement("SELECT bookingNo FROM Bookings WHERE bookingNo = ?")) {
+            statement.setInt(1, bookingNo);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    isValid = (bookingNo.equals(resultSet.getInt("bookingNo")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isValid;
     }
 }
 
@@ -38,15 +54,21 @@ public class EnterDetails extends JFrame {
         JButton enterPrescriptionsButton = new JButton("Enter prescriptions");
         panel.add(enterPrescriptionsButton);
 
-        enterVisitDetailsButton.addActionListener(e -> {
-            int bookingNo = Integer.parseInt(JOptionPane.showInputDialog("Enter booking number:"));
-            new EnterVisitDetails(bookingNo);
-        });
+        enterVisitDetailsButton.addActionListener(e -> handleButtonClick(true));
+        enterPrescriptionsButton.addActionListener(e -> handleButtonClick(false));
+    }
 
-        enterPrescriptionsButton.addActionListener(e -> {
+    private void handleButtonClick(boolean isVisitDetails) {
+        try {
             int bookingNo = Integer.parseInt(JOptionPane.showInputDialog("Enter booking number:"));
-            new EnterPrescriptions(bookingNo);
-        });
+            if (isVisitDetails) {
+                new EnterVisitDetails(bookingNo);
+            } else {
+                new EnterPrescriptions(bookingNo);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Invalid number entered.");
+        }
     }
 
     public static void main(String[] args) {
@@ -60,6 +82,10 @@ class EnterVisitDetails extends JFrame {
     private JTextField notesField;
 
     public EnterVisitDetails(int bookingNo) {
+        if (!DBConnection.confirmBookingID(bookingNo)){
+            JOptionPane.showMessageDialog(null, "Invalid booking number.");
+            return;
+        }
         this.bookingNo = bookingNo;
 
         setTitle("Enter Visit Details");
@@ -89,24 +115,31 @@ class EnterVisitDetails extends JFrame {
     private void saveVisitDetails() {
         String notes = notesField.getText();
 
-        try (Connection connection = DBConnection.getConnection()) {
-            String query = "INSERT INTO Visits (bookingNo, notes) VALUES (?, ?)";
-            PreparedStatement stmt = connection.prepareStatement(query);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     "INSERT INTO Visits (bookingNo, notes) VALUES (?, ?)",
+                     Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setInt(1, bookingNo);
             stmt.setString(2, notes);
-
             int rowsAffected = stmt.executeUpdate();
+
             if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Visit details saved successfully!");
-                this.dispose();
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int visitID = generatedKeys.getInt(1);
+                    JOptionPane.showMessageDialog(this, "Visit details saved successfully! Visit ID: " + visitID);
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to save visit details.");
             }
+            dispose();
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error saving visit details.");
         }
     }
+
 }
 
 // Enter Prescriptions
@@ -115,6 +148,10 @@ class EnterPrescriptions extends JFrame {
     private JTextField medField, dosageField, durationField, instructionsField;
 
     public EnterPrescriptions(int bookingNo) {
+        if (!DBConnection.confirmBookingID(bookingNo)){
+            JOptionPane.showMessageDialog(null, "Invalid booking number.");
+            return;
+        }
         this.bookingNo = bookingNo;
 
         setTitle("Enter Prescriptions");
@@ -154,41 +191,35 @@ class EnterPrescriptions extends JFrame {
     }
 
     private void savePrescription() {
-        String medication = medField.getText();
-        String dosage = dosageField.getText();
-        String duration = durationField.getText();
-        String instructions = instructionsField.getText();
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     "INSERT INTO Prescriptions (bookingNo, medicationName, dosage, duration, instructions) VALUES (?, ?, ?, ?, ?)",
+                     Statement.RETURN_GENERATED_KEYS)) {
 
-        try (Connection connection = DBConnection.getConnection()) {
-            String visitQuery = "SELECT visitID FROM Visits WHERE bookingNo = ?";
-            PreparedStatement visitStmt = connection.prepareStatement(visitQuery);
-            visitStmt.setInt(1, bookingNo);
-            ResultSet resultSet = visitStmt.executeQuery();
+            stmt.setInt(1, bookingNo);
+            stmt.setString(2, medField.getText());
+            stmt.setString(3, dosageField.getText());
+            stmt.setString(4, durationField.getText());
+            stmt.setString(5, instructionsField.getText());
 
-            if (resultSet.next()) {
-                int visitID = resultSet.getInt("visitID");
+            int rowsAffected = stmt.executeUpdate();
 
-                String prescriptionQuery = "INSERT INTO Prescriptions (visitID, medicationName, dosage, duration, instructions) VALUES (?, ?, ?, ?, ?)";
-                PreparedStatement stmt = connection.prepareStatement(prescriptionQuery);
-                stmt.setInt(1, visitID);
-                stmt.setString(2, medication);
-                stmt.setString(3, dosage);
-                stmt.setString(4, duration);
-                stmt.setString(5, instructions);
-
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, "Prescription saved successfully!");
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to save prescription.");
+            if (rowsAffected > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int prescriptionID = generatedKeys.getInt(1);
+                    JOptionPane.showMessageDialog(this, "Prescription saved successfully! Prescription ID: " + prescriptionID);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "No matching visit found.");
+                JOptionPane.showMessageDialog(this, "Failed to save prescription.");
             }
+            dispose();
+
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error saving prescription.");
         }
     }
+
+
 }
