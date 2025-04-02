@@ -37,17 +37,6 @@ CREATE TABLE Bookings (
     FOREIGN KEY (doctorID) REFERENCES Doctors(doctorID)
 );
 
--- Visit details table linked to bookings
-CREATE TABLE Visits (
-    visitID INT PRIMARY KEY AUTO_INCREMENT,
-    bookingNo INT,
-    notes TEXT,
-    prescriptionID INT NULL,
-    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo),
-    FOREIGN KEY (presciptionID) REFERENCES Prescriptions(prescriptionID)
-);
-
-
 -- Prescriptions table connected to visits
 CREATE TABLE Prescriptions (
     prescriptionID INT PRIMARY KEY AUTO_INCREMENT,
@@ -59,3 +48,16 @@ CREATE TABLE Prescriptions (
     FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo)
 
 );
+
+-- Visit details table linked to bookings
+CREATE TABLE Visits (
+    visitID INT PRIMARY KEY AUTO_INCREMENT,
+    bookingNo INT,
+    notes TEXT,
+    prescriptionID INT NULL,
+    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo),
+    FOREIGN KEY (prescriptionID) REFERENCES Prescriptions(prescriptionID)
+);
+
+
+
