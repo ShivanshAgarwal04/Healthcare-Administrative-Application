@@ -52,12 +52,15 @@ public class DoctorDashboard extends JFrame {
         String year = date.substring(0, 4);  // Extract year (YYYY)
         String month = date.substring(5, 7); // Extract month (MM)
 
-        String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
-
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DBConnection.getConnection()) {
             // Query to fetch all bookings matching the year and month
-            String query = "SELECT dayOfBooking, monthOfBooking, yearOfBooking, bookingTime, patientName, doctorName " +
-                    "FROM bookings WHERE yearOfBooking = ? AND monthOfBooking = ?";
+            String  query = "SELECT dayOfBooking, monthOfBooking, yearOfBooking, bookingTime, " +
+                            "Patients.patientName, Doctors.doctorName " +
+                            "FROM Bookings " +
+                            "JOIN Patients ON Bookings.patientID = Patients.patientID " +
+                            "JOIN Doctors ON Bookings.doctorID = Doctors.doctorID " +
+                            "WHERE yearOfBooking = ? AND monthOfBooking = ?";
+
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, year);
             statement.setString(2, month);
