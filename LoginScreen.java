@@ -85,9 +85,8 @@ public class LoginScreen extends JFrame {
 
     private boolean validateLogin(String username, String password) {
         boolean isValid = false;
-        String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DBConnection.getConnection()) {
             // Query to retrieve the password for the given username
             String query = "SELECT password FROM doctorCredentials WHERE username = ?";
             PreparedStatement statement = conn.prepareStatement(query);
