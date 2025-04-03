@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -12,43 +13,60 @@ public class LoginScreen extends JFrame {
     private JPasswordField passwordField;
 
     public LoginScreen() {
-        setTitle("Doctor Login");
+        setTitle("Doctor Interface Login");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        // Center the frame on the screen
+        setLocationRelativeTo(null);
+
+        // Create the main panel and set a nice layout
         JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);  // Add spacing between components
+
         add(panel);
-        placeComponents(panel);
+        placeComponents(panel, gbc);
 
         setVisible(true);
     }
 
-    private void placeComponents(JPanel panel) {
-        panel.setLayout(null);
+    private void placeComponents(JPanel panel, GridBagConstraints gbc) {
+        // Set the layout for the panel (GridBagLayout)
 
+        // Username label and field
         JLabel userLabel = new JLabel("Username:");
-        userLabel.setBounds(10, 20, 80, 25);
-        panel.add(userLabel);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(userLabel, gbc);
 
         usernameField = new JTextField(20);
-        usernameField.setBounds(100, 20, 165, 25);
-        usernameField.setName("usernameField");  // Set the name for testing
-        panel.add(usernameField);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(usernameField, gbc);
 
+        // Password label and field
         JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(10, 50, 80, 25);
-        panel.add(passwordLabel);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(passwordLabel, gbc);
 
         passwordField = new JPasswordField(20);
-        passwordField.setBounds(100, 50, 165, 25);
-        passwordField.setName("passwordField");  // Set the name for testing
-        panel.add(passwordField);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(passwordField, gbc);
 
+        // Login button
         JButton loginButton = new JButton("Login");
-        loginButton.setBounds(10, 80, 80, 25);
-        loginButton.setName("loginButton");  // Set the name for testing
-        panel.add(loginButton);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(loginButton, gbc);
 
+        // Action for the login button
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -56,8 +74,8 @@ public class LoginScreen extends JFrame {
                 String password = new String(passwordField.getPassword());
                 if (validateLogin(username, password)) {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Login Successful!");
-                    new DoctorDashboard(); // this opens the doctor's dashboard
-                    dispose(); // close and dispose of the login screen
+                    new MainMenu(); // Open the doctor's dashboard
+                    dispose(); // Close and dispose of the login screen
                 } else {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Invalid username or password.");
                 }
