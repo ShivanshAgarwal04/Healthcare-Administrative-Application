@@ -13,20 +13,19 @@ public class MainMenu extends JFrame {
 
     public MainMenu() {
         setTitle("Doctor Interface: Main Menu");
-        setSize(400, 400); // Increased size for better UI spacing
+        setSize(400, 500); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the window on the screen
+        setLocationRelativeTo(null); 
 
         JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridBagLayout()); // Improved layout management
+        panel2.setLayout(new GridBagLayout()); 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Padding for better spacing
-
+        gbc.insets = new Insets(5, 5, 5, 5); 
         messages = new ArrayList<>();
         placeComponents(panel2, gbc);
         add(panel2);
 
-        setVisible(true); // Ensure visibility after components are added
+        setVisible(true); 
     }
 
     private void placeComponents(JPanel panel2, GridBagConstraints gbc) {
@@ -53,7 +52,7 @@ public class MainMenu extends JFrame {
         messageButton.setName("messageButton");
         panel2.add(messageButton, gbc);
 
-        // Adding the new ViewDetails button
+
         gbc.gridy++;
         JButton viewDetailsButton = new JButton("View Details");
         viewDetailsButton.setName("viewDetailsButton");
@@ -64,6 +63,7 @@ public class MainMenu extends JFrame {
         EditVisitDetailsButton.setName("Edit Visit Details");
         panel2.add(EditVisitDetailsButton, gbc);
 
+      
         gbc.gridy++;
         messagePanel = new JPanel();
         messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
@@ -71,7 +71,7 @@ public class MainMenu extends JFrame {
         scrollPane.setPreferredSize(new Dimension(350, 150));
         panel2.add(scrollPane, gbc);
 
-        // Add action listeners
+   
         viewBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -104,7 +104,7 @@ public class MainMenu extends JFrame {
             }
         });
 
-        // Action listener for ViewDetails button
+       
         viewDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -113,15 +113,15 @@ public class MainMenu extends JFrame {
             }
         });
 
-        // Action listener for EditVisitDetails button
+    
         EditVisitDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Prompt the user to enter the Visit ID
+ 
                 String input = JOptionPane.showInputDialog("Enter Visit ID to edit:");
                 try {
-                    int visitID = Integer.parseInt(input); // Convert the input to an integer
-                    new EditVisitDetails(visitID); // Launch the EditVisitDetails screen with the visitID
+                    int visitID = Integer.parseInt(input); 
+                    new EditVisitDetails(visitID); 
                     System.out.println("Opened Edit Visit Details screen for Visit ID " + visitID);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid Visit ID entered.", "Error", JOptionPane.ERROR_MESSAGE);
