@@ -89,7 +89,9 @@ class EnterVisitDetails extends JFrame {
 
     private void saveVisitDetails() {
         String notes = notesField.getText();
-
+        if (visitDetailsExist()){
+            // Directs to edit details
+        }
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(
                      "INSERT INTO Visits (bookingNo, notes) VALUES (?, ?)",
@@ -114,20 +116,37 @@ class EnterVisitDetails extends JFrame {
             JOptionPane.showMessageDialog(this, "Error saving visit details.");
         }
     }
+    private boolean visitDetailsExist() {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT 1 FROM Visits WHERE bookingNo = ?")) {
+            stmt.setInt(1, bookingNo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // If a record is found, return true
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }
 
 // Enter Prescriptions
+// Enter Prescriptions
 class EnterPrescriptions extends JFrame {
-    private int bookingNo;
+    private int visitID;
     private JTextField medField, dosageField, durationField, instructionsField;
 
     public EnterPrescriptions(int bookingNo) {
+        // Confirm the booking number first
         if (!DBConnection.confirmBookingID(bookingNo)){
             JOptionPane.showMessageDialog(null, "Invalid booking number.");
             return;
         }
-        this.bookingNo = bookingNo;
+
+        // Retrieve the corresponding visit ID for the given booking
+        this.visitID = getVisitIDForBooking(bookingNo);
 
         setTitle("Enter Prescriptions");
         setSize(400, 300);
@@ -138,6 +157,22 @@ class EnterPrescriptions extends JFrame {
         placeComponents(panel);
 
         setVisible(true);
+    }
+
+    private int getVisitIDForBooking(int bookingNo) {
+        int visitID = -1; // default invalid value
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT visitID FROM Visits WHERE bookingNo = ?")) {
+            stmt.setInt(1, bookingNo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    visitID = rs.getInt("visitID");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return visitID;
     }
 
     private void placeComponents(JPanel panel) {
@@ -166,12 +201,16 @@ class EnterPrescriptions extends JFrame {
     }
 
     private void savePrescription() {
+        if (prescriptionExists()){
+            //redirects to edit visit details and prescriptions
+        }
+
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(
-                     "INSERT INTO Prescriptions (bookingNo, medicationName, dosage, duration, instructions) VALUES (?, ?, ?, ?, ?)",
+                     "INSERT INTO Prescriptions (visitID, medicationName, dosage, duration, instructions) VALUES (?, ?, ?, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, bookingNo);
+            stmt.setInt(1, visitID); // Use visitID from the constructor
             stmt.setString(2, medField.getText());
             stmt.setString(3, dosageField.getText());
             stmt.setString(4, durationField.getText());
@@ -189,12 +228,23 @@ class EnterPrescriptions extends JFrame {
                 JOptionPane.showMessageDialog(this, "Failed to save prescription.");
             }
             dispose();
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error saving prescription.");
         }
     }
-
+    private boolean prescriptionExists() {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement("SELECT 1 FROM Prescriptions WHERE visitID = ?")) {
+            stmt.setInt(1, visitID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // If a prescription record is found, return true
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
 }
+
