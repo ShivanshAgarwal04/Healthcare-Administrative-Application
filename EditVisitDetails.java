@@ -98,7 +98,7 @@ public class EditVisitDetails extends JFrame {
         panel.add(submitButton, constraints);
     }
 
-    // This method loads the current visit details (notes) and prescription details from the database
+    // Loads the current visit details (notes) and prescription details from the database
     private void loadExistingDetails() {
         // First check if the bookingID exists in the Visits table
         try (Connection connection = DBConnection.getConnection();
@@ -108,10 +108,10 @@ public class EditVisitDetails extends JFrame {
                 if (rs.next()) {
                     visitID = rs.getInt("visitID");
 
-                    // Now load the visit details using the visitID
+                    // Load the visit details using the visitID
                     loadVisitDetails();
 
-                    // Now load Prescription details using the same bookingID
+                    // Load Prescription details using the same bookingID
                     loadPrescriptionDetails(bookingID);
                 } else {
                     JOptionPane.showMessageDialog(this, "No visit found for the given Booking ID.");
@@ -124,7 +124,7 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // This method loads the visit details (notes) from the Visits table
+    // Method loads the visit details (notes) from the Visits table
     private void loadVisitDetails() {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement("SELECT notes FROM Visits WHERE visitID = ?")) {
@@ -143,7 +143,7 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // This method loads the current prescription details using bookingID
+    // Loads the current prescription details using bookingID
     private void loadPrescriptionDetails(int bookingID) {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE bookingNo = ?")) {
@@ -166,7 +166,7 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // This method updates both the visit details and prescription details in the database
+    // Updates both the visit details and prescription details in the database
     private void updateDetails() {
         String notes = notesField.getText();
         String medication = medicationField.getText();
@@ -174,7 +174,7 @@ public class EditVisitDetails extends JFrame {
         String duration = durationField.getText();
         String instructions = instructionsField.getText();
 
-        // Make sure that the fields are not empty
+        // Checks if fields are empty
         if (notes.trim().isEmpty() || medication.trim().isEmpty() || dosage.trim().isEmpty() ||
                 duration.trim().isEmpty() || instructions.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields must be filled!");
@@ -216,7 +216,7 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // This method sends a confirmation message to the doctor and patient
+    // confirmation message to the doctor and patient
     private void sendConfirmationMessage() {
         // Placeholder for sending confirmation logic
         JOptionPane.showMessageDialog(this, "Confirmation sent to doctor and patient.");
