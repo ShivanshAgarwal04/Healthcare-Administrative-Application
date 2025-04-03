@@ -37,26 +37,23 @@ CREATE TABLE Bookings (
     FOREIGN KEY (doctorID) REFERENCES Doctors(doctorID)
 );
 
--- Prescriptions table connected to visits
-CREATE TABLE Prescriptions (
-    prescriptionID INT PRIMARY KEY AUTO_INCREMENT,
-    bookingNo INT,
-    medicationName VARCHAR(100),
-    dosage VARCHAR(50),
-    duration VARCHAR(50),
-    instructions TEXT,
-    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo)
-
-);
-
--- Visit details table linked to bookings
+-- Visits Table
 CREATE TABLE Visits (
     visitID INT PRIMARY KEY AUTO_INCREMENT,
-    bookingNo INT,
+    bookingNo INT UNIQUE NOT NULL,
     notes TEXT,
-    prescriptionID INT NULL,
-    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo),
-    FOREIGN KEY (prescriptionID) REFERENCES Prescriptions(prescriptionID)
+    FOREIGN KEY (bookingNo) REFERENCES Bookings(bookingNo) ON DELETE CASCADE
+);
+
+-- Prescriptions Table
+CREATE TABLE Prescriptions (
+    prescriptionID INT PRIMARY KEY AUTO_INCREMENT,
+    visitID INT NOT NULL,
+    medicationName VARCHAR(100) NOT NULL,
+    dosage VARCHAR(50) NOT NULL,
+    duration VARCHAR(50) NOT NULL,
+    instructions TEXT,
+    FOREIGN KEY (visitID) REFERENCES Visits(visitID) ON DELETE CASCADE
 );
 
 
