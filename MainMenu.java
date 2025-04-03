@@ -10,9 +10,11 @@ public class MainMenu extends JFrame {
     LocalTime currentTime = LocalTime.now();
     private JPanel messagePanel;
     private ArrayList<JTextArea> messages;
+    private Integer doctorID;
 
-    public MainMenu() {
+    public MainMenu(Integer doctorID) {
         setTitle("Doctor Interface: Main Menu");
+        this.doctorID = doctorID;
         setSize(400, 500); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); 
@@ -33,9 +35,10 @@ public class MainMenu extends JFrame {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton viewBookings = new JButton("Bookings");
+        JButton viewBookings = new JButton("View bookings");
         viewBookings.setName("viewBookings");
         panel2.add(viewBookings, gbc);
+
 
         gbc.gridy++;
         JButton enterButton = new JButton("Enter Details");
@@ -83,7 +86,7 @@ public class MainMenu extends JFrame {
         enterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new EnterDetails(); // Open EnterDetails when clicked
+                new EnterDetails(doctorID); // Open EnterDetails when clicked
                 System.out.println("Opened Enter Details screen at " + currentTime);
             }
         });
@@ -108,7 +111,7 @@ public class MainMenu extends JFrame {
         viewDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new ViewDetails(); // Launch the ViewDetails screen
+                new ViewDetails(doctorID); // Launch the ViewDetails screen
                 System.out.println("Opened View Details screen at " + currentTime);
             }
         });
