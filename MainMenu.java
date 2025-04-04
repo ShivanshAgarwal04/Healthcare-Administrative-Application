@@ -43,6 +43,11 @@ public class MainMenu extends JFrame {
         panel2.add(viewBookings, gbc);
 
         gbc.gridy++;
+        JButton viewPatientsButton = new JButton("View Patients");
+        viewPatientsButton.setName("viewPatientsButton");
+        panel2.add(viewPatientsButton, gbc);
+
+        gbc.gridy++;
         JButton enterButton = new JButton("Enter Details");
         enterButton.setName("Enter details");
         panel2.add(enterButton, gbc);
@@ -54,9 +59,9 @@ public class MainMenu extends JFrame {
         panel2.add(viewDetailsButton, gbc);
 
         gbc.gridy++;
-        JButton viewPatientsButton = new JButton("View Patients");
-        viewDetailsButton.setName("viewPatientsButton");
-        panel2.add(viewPatientsButton, gbc);
+        JButton editDetailButton = new JButton("Edit visit details");
+        editDetailButton.setName("editVisitDetails");
+        panel2.add(editDetailButton, gbc);
 
         gbc.gridy++;
         JButton AssignNewDoctorButton = new JButton("Assign New Doctor");
@@ -117,6 +122,19 @@ public class MainMenu extends JFrame {
                     int bookingNo = Integer.parseInt(input);
                     new AssignNewDoctor(bookingNo);
                     System.out.println("Opened Assign New Doctor screen for Booking No: " + bookingNo + " at " + currentTime);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid Booking Number entered.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        editDetailButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String input = JOptionPane.showInputDialog("Enter Booking Number:");
+                try {
+                    int bookingNo = Integer.parseInt(input);
+                    new EditVisitDetails(bookingNo);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid Booking Number entered.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
