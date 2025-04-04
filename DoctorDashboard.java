@@ -12,20 +12,21 @@ public class DoctorDashboard extends JFrame {
     public DoctorDashboard(String doctorName, Integer doctorID) {
         this.doctorName = doctorName;
         this.doctorID = doctorID;
-        setTitle("Doctor Dashboard");
-        setSize(400, 300);
+
+        setTitle("Doctor Dashboard - " + doctorName);
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
+        panel.setLayout(null);
         add(panel);
+
         placeComponents(panel);
 
         setVisible(true);
     }
 
     private void placeComponents(JPanel panel) {
-        panel.setLayout(null);
-
         JLabel dateLabel = new JLabel("Enter Date (YYYY-MM):");
         dateLabel.setBounds(10, 20, 160, 25);
         panel.add(dateLabel);
@@ -39,40 +40,41 @@ public class DoctorDashboard extends JFrame {
         panel.add(viewBookingsButton);
 
         bookingsArea = new JTextArea();
-        bookingsArea.setBounds(10, 100, 350, 150);
-        panel.add(bookingsArea);
+        bookingsArea.setEditable(false);
+        bookingsArea.setLineWrap(true);
+        bookingsArea.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(bookingsArea);
+        scrollPane.setBounds(10, 100, 410, 190);
+        panel.add(scrollPane);
 
         viewBookingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String date = dateField.getText();
+                String date = dateField.getText().trim();
                 viewBookings(date);
             }
         });
     }
 
     private void viewBookings(String date) {
-        // 1. First verify the doctorName value
         System.out.println("[DEBUG] Current doctorName: '" + this.doctorName + "'");
         System.out.println("[DEBUG] Date entered: " + date);
 
-        // 2. Validate date format (YYYY-MM)
         if (date == null || !date.matches("\\d{4}-\\d{2}")) {
-            bookingsArea.setText("Invalid format. Use YYYY-MM");
+            JOptionPane.showMessageDialog(this, "Invalid format. Use YYYY-MM", "Input Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
         String year = date.substring(0, 4);
         String month = date.substring(5, 7);
 
-        System.out.println("Searching for bookings for Doctor: " + this.doctorName); // Debugging
-        System.out.println("Year: " + year + ", Month: " + month); // Debugging
-
-
         try (Connection conn = DBConnection.getConnection()) {
-            // Query to match doctorName correctly using a JOIN
-            String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, b.patientID " +
+            String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, " +
+                    "p.patientName " +
                     "FROM bookings b " +
                     "JOIN doctors d ON b.doctorID = d.doctorID " +
+                    "JOIN patients p ON b.patientID = p.patientID " +
                     "WHERE b.yearOfBooking = ? AND b.monthOfBooking = ? AND d.doctorName = ?";
 
             PreparedStatement statement = conn.prepareStatement(query);
@@ -80,7 +82,7 @@ public class DoctorDashboard extends JFrame {
             statement.setString(2, month);
             statement.setString(3, doctorName);
 
-            System.out.println("Executing SQL Query: " + statement.toString()); // Debugging
+            System.out.println("Executing SQL Query: " + statement); // Debugging
 
             ResultSet resultSet = statement.executeQuery();
 
@@ -89,18 +91,14 @@ public class DoctorDashboard extends JFrame {
 
             while (resultSet.next()) {
                 found = true;
-                String dayOfBooking = resultSet.getString("dayOfBooking");
-                String monthOfBooking = resultSet.getString("monthOfBooking");
-                String yearOfBooking = resultSet.getString("yearOfBooking");
-                String bookingTime = resultSet.getString("bookingTime");
-                String patientID = resultSet.getString("patientID");
+                String day = resultSet.getString("dayOfBooking");
+                String time = resultSet.getString("bookingTime");
+                String patientName = resultSet.getString("patientName");
 
-                String calendarDate = dayOfBooking + "-" + monthOfBooking + "-" + yearOfBooking;
-
-                bookingsText.append("Date: ").append(calendarDate)
-                        .append("\nTime: ").append(bookingTime)
-                        .append("\nPatient: ").append(patientID)
-                        .append("\n------------------\n");
+                bookingsText.append("📅 Date: ").append(String.format("%s-%s-%s", day, month, year))
+                        .append("\n⏰ Time: ").append(time)
+                        .append("\n👤 Patient: ").append(patientName)
+                        .append("\n------------------------------\n");
             }
 
             if (found) {
@@ -108,13 +106,10 @@ public class DoctorDashboard extends JFrame {
             } else {
                 bookingsArea.setText("No bookings found for " + doctorName + " in " + date);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
             bookingsArea.setText("Error fetching bookings: " + e.getMessage());
-        } catch (StringIndexOutOfBoundsException e) {
-            bookingsArea.setText("Please enter date in YYYY-MM format");
         }
     }
-
-
 }
