@@ -33,6 +33,8 @@ CREATE TABLE Bookings (
     bookingTime TIME DEFAULT NULL,
     patientID INT,
     doctorID INT,
+    FOREiGN KEY (patientName) REFERENCES Patients(patientName),
+    FOREIGN KEY (doctorName) REFERENCES Patients(doctorName),
     FOREIGN KEY (patientID) REFERENCES Patients(patientID),
     FOREIGN KEY (doctorID) REFERENCES Doctors(doctorID)
 );
