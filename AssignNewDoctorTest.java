@@ -40,7 +40,7 @@ public class AssignNewDoctorTest {
 
         lastDialogMessage = null;
         assignNewDoctor = new AssignNewDoctor(123) {
-            @Override
+
             void showMessageDialog(String message) {
                 lastDialogMessage = message;
             }
