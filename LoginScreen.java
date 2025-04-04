@@ -66,16 +66,19 @@ public class LoginScreen extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(loginButton, gbc);
 
-        // Action for the login button
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
+
                 if (validateLogin(username, password)) {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Login Successful!");
-                    new MainMenu(); // Open the doctor's dashboard
-                    dispose(); // Close and dispose of the login screen
+
+                    // Pass the doctor's name to MainMenu
+                    String doctorName = username; // Assuming username = doctorName
+                    new MainMenu(doctorName); // Open MainMenu with the doctor's name
+                    dispose(); // Close login screen
                 } else {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Invalid username or password.");
                 }
@@ -85,8 +88,9 @@ public class LoginScreen extends JFrame {
 
     private boolean validateLogin(String username, String password) {
         boolean isValid = false;
+        String url = "jdbc:mysql://localhost/doctorinterface?user=sagarwal&password=softwaredev";
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = DriverManager.getConnection(url)) {
             // Query to retrieve the password for the given username
             String query = "SELECT password FROM doctorCredentials WHERE username = ?";
             PreparedStatement statement = conn.prepareStatement(query);
