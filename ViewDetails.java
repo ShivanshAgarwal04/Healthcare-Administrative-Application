@@ -34,7 +34,7 @@ public class ViewDetails extends JFrame {
 
     private void confirmPrescriptionID() {
         try {
-            int prescriptionID = Integer.parseInt(JOptionPane.showInputDialog("Enter PrescriptionID number:"));
+            int prescriptionID = Integer.parseInt(JOptionPane.showInputDialog("Enter Booking ID:"));
             new ViewPrescription(prescriptionID);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "Invalid number entered.");
@@ -83,7 +83,7 @@ class ViewVisitDetails extends JFrame {
 }
 
 class ViewPrescription extends JFrame {
-    public ViewPrescription(int prescriptionID) {
+    public ViewPrescription(int bookingNo) {
         setTitle("Prescription Details");
         setSize(600, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -94,13 +94,26 @@ class ViewPrescription extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
+        String query = "SELECT p.prescriptionID, v.bookingNo, p.medicationName, p.dosage, p.duration, p.instructions " +
+                "FROM Prescriptions p " +
+                "JOIN Visits v ON p.visitID = v.visitID " +
+                "WHERE v.bookingNo = ?";
+
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE prescriptionID = ?")) {
-            stmt.setInt(1, prescriptionID);
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setInt(1, bookingNo);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    model.addRow(new Object[]{rs.getInt("prescriptionID"), rs.getInt("bookingNo"), rs.getString("medicationName"),
-                            rs.getString("dosage"), rs.getString("duration"), rs.getString("instructions")});
+                    model.addRow(new Object[]{
+                            rs.getInt("prescriptionID"),
+                            rs.getInt("bookingNo"),
+                            rs.getString("medicationName"),
+                            rs.getString("dosage"),
+                            rs.getString("duration"),
+                            rs.getString("instructions")
+                    });
                 }
             }
         } catch (SQLException ex) {

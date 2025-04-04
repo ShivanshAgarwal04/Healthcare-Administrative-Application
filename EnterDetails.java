@@ -91,6 +91,8 @@ class EnterVisitDetails extends JFrame {
         String notes = notesField.getText();
         if (visitDetailsExist()){
             // Directs to edit details
+            new EditVisitDetails(bookingNo);
+            dispose();
         }
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(
@@ -137,9 +139,11 @@ class EnterVisitDetails extends JFrame {
 class EnterPrescriptions extends JFrame {
     private int visitID;
     private JTextField medField, dosageField, durationField, instructionsField;
+    private Integer bookingNo;
 
-    public EnterPrescriptions(int bookingNo) {
+    public EnterPrescriptions(Integer bookingNo) {
         // Confirm the booking number first
+        this.bookingNo = bookingNo;
         if (!DBConnection.confirmBookingID(bookingNo)){
             JOptionPane.showMessageDialog(null, "Invalid booking number.");
             return;
@@ -203,6 +207,8 @@ class EnterPrescriptions extends JFrame {
     private void savePrescription() {
         if (prescriptionExists()){
             //redirects to edit visit details and prescriptions
+            new EditVisitDetails(bookingNo);
+            dispose();
         }
 
         try (Connection connection = DBConnection.getConnection();

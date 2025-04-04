@@ -71,7 +71,7 @@ public class DoctorDashboard extends JFrame {
 
         try (Connection conn = DBConnection.getConnection()) {
             String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, " +
-                    "p.patientName " +
+                    "p.patientName, b.bookingNo " +
                     "FROM bookings b " +
                     "JOIN doctors d ON b.doctorID = d.doctorID " +
                     "JOIN patients p ON b.patientID = p.patientID " +
@@ -94,8 +94,10 @@ public class DoctorDashboard extends JFrame {
                 String day = resultSet.getString("dayOfBooking");
                 String time = resultSet.getString("bookingTime");
                 String patientName = resultSet.getString("patientName");
+                String bookingNo = resultSet.getString("bookingNo");
 
-                bookingsText.append("📅 Date: ").append(String.format("%s-%s-%s", day, month, year))
+                bookingsText.append("Booking ID:").append(bookingNo)
+                        .append("\n📅 Date: ").append(String.format("%s-%s-%s", day, month, year))
                         .append("\n⏰ Time: ").append(time)
                         .append("\n👤 Patient: ").append(patientName)
                         .append("\n------------------------------\n");

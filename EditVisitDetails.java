@@ -146,7 +146,10 @@ public class EditVisitDetails extends JFrame {
     // Loads the current prescription details using bookingID
     private void loadPrescriptionDetails(int bookingID) {
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Prescriptions WHERE bookingNo = ?")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT p.*\n" +
+                     "FROM Visits v\n" +
+                     "JOIN Prescriptions p ON v.visitID = p.visitID\n" +
+                     "WHERE v.bookingNo = ?\n")) {
             stmt.setInt(1, bookingID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

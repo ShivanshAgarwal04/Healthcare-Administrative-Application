@@ -18,7 +18,7 @@ public class MainMenu extends JFrame {
 
         setTitle("Doctor Interface: Main Menu - " + doctorName);
         setSize(400, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel2 = new JPanel();
