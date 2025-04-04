@@ -7,8 +7,11 @@ public class DoctorDashboard extends JFrame {
     public JTextField dateField;
     private JTextArea bookingsArea;
     private String doctorName;
+    private Integer doctorID;
 
-    public DoctorDashboard() {
+    public DoctorDashboard(String doctorName, Integer doctorID) {
+        this.doctorName = doctorName;
+        this.doctorID = doctorID;
         setTitle("Doctor Dashboard");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,7 +78,7 @@ public class DoctorDashboard extends JFrame {
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, year);
             statement.setString(2, month);
-            statement.setString(3, this.doctorName);
+            statement.setString(3, doctorName);
 
             System.out.println("Executing SQL Query: " + statement.toString()); // Debugging
 
@@ -112,7 +115,6 @@ public class DoctorDashboard extends JFrame {
             bookingsArea.setText("Please enter date in YYYY-MM format");
         }
     }
-
 
 
 }

@@ -13,7 +13,7 @@ public class MainMenu extends JFrame {
     private ArrayList<JTextArea> messages;
 
     public MainMenu(Integer doctorID) {
-        String doctorName = DBConnection.getDoctorName(doctorID);
+        this.doctorName = DBConnection.getDoctorName(doctorID);
         this.doctorID = doctorID;
 
         setTitle("Doctor Interface: Main Menu - " + doctorName);
@@ -79,7 +79,7 @@ public class MainMenu extends JFrame {
         viewBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new DoctorDashboard();
+                new DoctorDashboard(doctorName, doctorID);
                 System.out.println("Opened Bookings Dashboard for Dr. " + doctorName + " at " + currentTime);
             }
         });
@@ -144,5 +144,9 @@ public class MainMenu extends JFrame {
         messagePanel.add(messageBox);
         messagePanel.revalidate();
         messagePanel.repaint();
+    }
+
+    public static void main(String[] args) {
+        new MainMenu(20002);
     }
 }
