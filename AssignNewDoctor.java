@@ -155,7 +155,7 @@ public class AssignNewDoctor extends JFrame {
                 }
             }
 
-            // Simulated confirmation messages
+
             JOptionPane.showMessageDialog(this, "Confirmation sent to:\n" +
                     "- Patient: " + patientName + " (" + patientEmail + ")\n" +
                     "- Old Doctor: " + oldDoctorName + " (" + oldDoctorEmail + ")\n" +

@@ -13,7 +13,6 @@ public class EditVisitDetails extends JFrame {
     JTextField durationField;
     JTextField instructionsField;
 
-    // Constructor to initialize with bookingID
     public EditVisitDetails(int bookingID) {
         this.bookingID = bookingID;
 
@@ -32,23 +31,21 @@ public class EditVisitDetails extends JFrame {
     }
 
     private void placeComponents(JPanel panel) {
-        // Use GridBagLayout for flexible layout control
         panel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);  // Add some space around components
         constraints.anchor = GridBagConstraints.WEST;
 
-        // Visit notes label and text area
         JLabel notesLabel = new JLabel("Edit Visit Notes:");
         constraints.gridx = 0;
         constraints.gridy = 0;
         panel.add(notesLabel, constraints);
 
-        notesField = new JTextArea(5, 30);  // Adjust size for better visibility
+        notesField = new JTextArea(5, 30);
         JScrollPane scrollPane = new JScrollPane(notesField);
         constraints.gridx = 1;
         constraints.gridy = 0;
-        constraints.gridwidth = 2;  // Make it span across two columns
+        constraints.gridwidth = 2;
         panel.add(scrollPane, constraints);
 
         // Prescription fields (Medication, Dosage, Duration, Instructions)
@@ -127,7 +124,7 @@ public class EditVisitDetails extends JFrame {
         }
     }
 
-    // Method loads the visit details (notes) from the Visits table
+    // Loads the visit details (notes) from the Visits table
     private void loadVisitDetails() {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement("SELECT notes FROM Visits WHERE visitID = ?")) {
