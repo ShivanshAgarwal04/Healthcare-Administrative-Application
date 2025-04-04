@@ -6,29 +6,26 @@ import java.util.List;
 
 public class AssignNewDoctor extends JFrame {
     private int bookingNo;
-    JComboBox<String> doctorList;
-    JComboBox<String> patientList;
-    List<Integer> doctorIDs;
-    List<Integer> patientIDs;
+    private int patientID;
+    private String patientName;
+    private JComboBox<String> doctorList;
+    private List<Integer> doctorIDs;
 
     public AssignNewDoctor(int bookingNo) {
         this.bookingNo = bookingNo;
+        doctorIDs = new ArrayList<>();
 
-        setTitle("Assign New Doctor to Patient");
-        setSize(400, 300);
+        setTitle("Assign New Doctor");
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(5, 1, 10, 10));
+        setLayout(new GridLayout(4, 1, 10, 10));
+
+        JLabel patientLabel = new JLabel();
+        add(patientLabel);
+
+        loadPatientAndDoctorDetails(patientLabel);
 
         doctorList = new JComboBox<>();
-        patientList = new JComboBox<>();
-
-        doctorIDs = new ArrayList<>();
-        patientIDs = new ArrayList<>();
-
-        add(new JLabel("Select Patient:"));
-        add(patientList);
-        loadPatients();
-
         add(new JLabel("Select New Doctor:"));
         add(doctorList);
         loadDoctors();
@@ -38,6 +35,35 @@ public class AssignNewDoctor extends JFrame {
         add(assignButton);
 
         setVisible(true);
+    }
+
+    private void loadPatientAndDoctorDetails(JLabel patientLabel) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     "SELECT P.patientID, P.patientName, D.doctorID, D.doctorName " +
+                             "FROM Bookings B " +
+                             "JOIN Patients P ON B.patientID = P.patientID " +
+                             "JOIN Doctors D ON B.doctorID = D.doctorID " +
+                             "WHERE B.bookingNo = ?")) {
+
+            stmt.setInt(1, bookingNo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    patientID = rs.getInt("patientID");
+                    patientName = rs.getString("patientName");
+                    String doctorName = rs.getString("doctorName");
+
+                    patientLabel.setText("<html>Patient: <b>" + patientName + "</b><br>Current Doctor: <b>" + doctorName + "</b></html>");
+                } else {
+                    JOptionPane.showMessageDialog(this, "No patient found for this booking.");
+                    dispose();
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading patient and doctor details.");
+            dispose();
+        }
     }
 
     private void loadDoctors() {
@@ -58,93 +84,61 @@ public class AssignNewDoctor extends JFrame {
         }
     }
 
-    private void loadPatients() {
-        patientList.removeAllItems();
-        patientIDs.clear();
-
-        try (Connection connection = DBConnection.getConnection();
-             Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT patientID, patientName FROM Patients")) {
-
-            while (rs.next()) {
-                patientIDs.add(rs.getInt("patientID"));
-                patientList.addItem(rs.getString("patientName"));
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading patients.");
-        }
-    }
-
     private void assignDoctor() {
         int doctorIndex = doctorList.getSelectedIndex();
-        int patientIndex = patientList.getSelectedIndex();
-
-        if (doctorIndex == -1 || patientIndex == -1) {
-            JOptionPane.showMessageDialog(this, "Please select both a doctor and a patient.");
+        if (doctorIndex == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a doctor.");
             return;
         }
 
         int newDoctorID = doctorIDs.get(doctorIndex);
-        int patientID = patientIDs.get(patientIndex);
-        int foundBookingNo = -1;
-
         try (Connection connection = DBConnection.getConnection()) {
-            // Get the current booking number for this patient
+            // Get old doctor details
+            String oldDoctorName = "", oldDoctorEmail = "";
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT bookingNo FROM Bookings WHERE patientID = ?")) {
-                stmt.setInt(1, patientID);
+                    "SELECT D.doctorName, D.email FROM Bookings B " +
+                            "JOIN Doctors D ON B.doctorID = D.doctorID " +
+                            "WHERE B.bookingNo = ?")) {
+                stmt.setInt(1, bookingNo);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        foundBookingNo = rs.getInt("bookingNo");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "No booking found for this patient.");
-                        return;
+                        oldDoctorName = rs.getString("doctorName");
+                        oldDoctorEmail = rs.getString("email");
                     }
                 }
             }
 
-            // Update the doctor in the booking
+            // Update the booking with the new doctor
             try (PreparedStatement stmt = connection.prepareStatement(
                     "UPDATE Bookings SET doctorID = ? WHERE bookingNo = ?")) {
                 stmt.setInt(1, newDoctorID);
-                stmt.setInt(2, foundBookingNo);
+                stmt.setInt(2, bookingNo);
 
                 int rows = stmt.executeUpdate();
                 if (rows > 0) {
                     JOptionPane.showMessageDialog(this, "Doctor reassigned successfully.");
-                    sendConfirmationMessage(connection, foundBookingNo, newDoctorID);
+                    sendConfirmationMessage(connection, oldDoctorName, oldDoctorEmail, newDoctorID);
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to reassign doctor.");
                 }
             }
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Database error during doctor reassignment.");
         }
     }
 
-    private void sendConfirmationMessage(Connection connection, int bookingNo, int newDoctorID) {
-        String patientName = "", patientEmail = "";
-        String newDoctorName = "", newDoctorEmail = "";
-        String oldDoctorName = "", oldDoctorEmail = "";
+    private void sendConfirmationMessage(Connection connection, String oldDoctorName, String oldDoctorEmail, int newDoctorID) {
+        String patientEmail = "", newDoctorName = "", newDoctorEmail = "";
 
         try {
-            // Get patient and old doctor info
+            // Get patient email
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT P.patientName, P.email AS patientEmail, D.doctorName AS oldDocName, D.email AS oldDocEmail " +
-                            "FROM Bookings B " +
-                            "JOIN Patients P ON B.patientID = P.patientID " +
-                            "JOIN Doctors D ON B.doctorID = D.doctorID " +
-                            "WHERE B.bookingNo = ?")) {
-                stmt.setInt(1, bookingNo);
+                    "SELECT email FROM Patients WHERE patientID = ?")) {
+                stmt.setInt(1, patientID);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        patientName = rs.getString("patientName");
-                        patientEmail = rs.getString("patientEmail");
-                        oldDoctorName = rs.getString("oldDocName");
-                        oldDoctorEmail = rs.getString("oldDocEmail");
+                        patientEmail = rs.getString("email");
                     }
                 }
             }
@@ -161,7 +155,7 @@ public class AssignNewDoctor extends JFrame {
                 }
             }
 
-            // Simulate sending messages
+            // Simulated confirmation messages
             JOptionPane.showMessageDialog(this, "Confirmation sent to:\n" +
                     "- Patient: " + patientName + " (" + patientEmail + ")\n" +
                     "- Old Doctor: " + oldDoctorName + " (" + oldDoctorEmail + ")\n" +
@@ -174,6 +168,6 @@ public class AssignNewDoctor extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new AssignNewDoctor(1));
+        SwingUtilities.invokeLater(() -> new AssignNewDoctor(30001)); // Example Booking ID
     }
 }
