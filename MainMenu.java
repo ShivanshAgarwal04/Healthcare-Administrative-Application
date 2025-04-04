@@ -14,6 +14,7 @@ public class MainMenu extends JFrame {
 
     public MainMenu(Integer doctorID) {
         String doctorName = DBConnection.getDoctorName(doctorID);
+        this.doctorID = doctorID;
 
         setTitle("Doctor Interface: Main Menu - " + doctorName);
         setSize(400, 500);
@@ -46,10 +47,6 @@ public class MainMenu extends JFrame {
         enterButton.setName("Enter details");
         panel2.add(enterButton, gbc);
 
-        gbc.gridy++;
-        JButton messageButton = new JButton("Messaging System");
-        messageButton.setName("messageButton");
-        panel2.add(messageButton, gbc);
 
         gbc.gridy++;
         JButton viewDetailsButton = new JButton("View Details");
@@ -57,9 +54,9 @@ public class MainMenu extends JFrame {
         panel2.add(viewDetailsButton, gbc);
 
         gbc.gridy++;
-        JButton EditVisitDetailsButton = new JButton("Edit Visit Details");
-        EditVisitDetailsButton.setName("Edit Visit Details");
-        panel2.add(EditVisitDetailsButton, gbc);
+        JButton viewPatientsButton = new JButton("View Patients");
+        viewDetailsButton.setName("viewPatientsButton");
+        panel2.add(viewPatientsButton, gbc);
 
         gbc.gridy++;
         JButton AssignNewDoctorButton = new JButton("Assign New Doctor");
@@ -95,12 +92,6 @@ public class MainMenu extends JFrame {
             }
         });
 
-        messageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new MessagingSystem(MainMenu.this);
-            }
-        });
 
         viewDetailsButton.addActionListener(new ActionListener() {
             @Override
@@ -110,18 +101,12 @@ public class MainMenu extends JFrame {
             }
         });
 
-        EditVisitDetailsButton.addActionListener(new ActionListener() {
+        viewPatientsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String input = JOptionPane.showInputDialog("Enter Booking ID to edit:");
-                try {
-                    int visitID = Integer.parseInt(input);
-                    new EditVisitDetails(visitID);
-                    System.out.println("Opened Edit Visit Details screen for Visit ID " + visitID);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Invalid Visit ID entered.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                new ViewPatients(doctorID);
             }
+
         });
 
         AssignNewDoctorButton.addActionListener(new ActionListener() {

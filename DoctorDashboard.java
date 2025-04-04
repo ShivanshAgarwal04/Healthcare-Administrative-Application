@@ -67,7 +67,7 @@ public class DoctorDashboard extends JFrame {
 
         try (Connection conn = DBConnection.getConnection()) {
             // Query to match doctorName correctly using a JOIN
-            String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, b.patientName " +
+            String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, b.patientID " +
                     "FROM bookings b " +
                     "JOIN doctors d ON b.doctorID = d.doctorID " +
                     "WHERE b.yearOfBooking = ? AND b.monthOfBooking = ? AND d.doctorName = ?";
@@ -90,13 +90,13 @@ public class DoctorDashboard extends JFrame {
                 String monthOfBooking = resultSet.getString("monthOfBooking");
                 String yearOfBooking = resultSet.getString("yearOfBooking");
                 String bookingTime = resultSet.getString("bookingTime");
-                String patientName = resultSet.getString("patientName");
+                String patientID = resultSet.getString("patientID");
 
                 String calendarDate = dayOfBooking + "-" + monthOfBooking + "-" + yearOfBooking;
 
                 bookingsText.append("Date: ").append(calendarDate)
                         .append("\nTime: ").append(bookingTime)
-                        .append("\nPatient: ").append(patientName)
+                        .append("\nPatient: ").append(patientID)
                         .append("\n------------------\n");
             }
 

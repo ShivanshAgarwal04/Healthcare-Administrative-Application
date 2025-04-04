@@ -25,7 +25,7 @@ public class ViewDetails extends JFrame {
         JButton viewVisitDetailsButton = new JButton("View visit details");
         panel.add(viewVisitDetailsButton);
 
-        JButton viewPrescriptionsButton = new JButton("view prescriptions");
+        JButton viewPrescriptionsButton = new JButton("View prescriptions");
         panel.add(viewPrescriptionsButton);
 
         viewVisitDetailsButton.addActionListener(e -> confirmVisitID());

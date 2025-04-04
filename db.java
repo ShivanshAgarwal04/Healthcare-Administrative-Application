@@ -2,7 +2,7 @@ import java.sql.*;
 
 // Database Connection
 class DBConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/testdb";
+    private static final String URL = "jdbc:mysql://localhost:3306/testdatabase";
     private static final String USER = "root";
     private static final String PASSWORD = "Password.123";
 
