@@ -25,4 +25,7 @@ class DBConnection {
         }
         return isValid;
     }
+
+    public static void setTestConnection(Connection connection) {
+    }
 }

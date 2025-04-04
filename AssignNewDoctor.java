@@ -4,10 +4,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssignNewDoctor extends JFrame {
+public abstract class AssignNewDoctor extends JFrame {
     private int bookingNo;
-    private JComboBox<String> doctorList;
-    private List<Integer> doctorIDs; // Stores doctor IDs for reference
+    JComboBox<String> doctorList;
+    List<Integer> doctorIDs; // Stores doctor IDs for reference
 
     // Constructor to initialize the JFrame
     public AssignNewDoctor(int bookingNo) {
@@ -56,7 +56,7 @@ public class AssignNewDoctor extends JFrame {
     }
 
     // Assign selected doctor to the booking
-    private void assignDoctor() {
+    void assignDoctor() {
         int selectedIndex = doctorList.getSelectedIndex();
         if (selectedIndex == -1) {
             JOptionPane.showMessageDialog(this, "Please select a doctor.");
@@ -138,4 +138,6 @@ public class AssignNewDoctor extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new AssignNewDoctor(123)); // Test with a bookingNo
     }
+
+    protected abstract void showMessageDialog(String message);
 }

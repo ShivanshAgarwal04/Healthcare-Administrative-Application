@@ -4,10 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MessagingSystem extends JFrame{
-    private JTextField recipientField;
-    private JTextField patientField;
-    private JTextArea messageBody;
-    private JButton sendButton;
+    JTextField recipientField;
+    JTextField patientField;
+    JTextArea messageBody;
+    JButton sendButton;
     private MainMenu mainMenu;
 
     public MessagingSystem(MainMenu mainMenu) {
@@ -73,7 +73,7 @@ public class MessagingSystem extends JFrame{
         setVisible(true);
     }
 
-    private void sendMessage() {
+    void sendMessage() {
         String recipient = recipientField.getText().trim();
         String patient = patientField.getText().trim();
         String message = messageBody.getText().trim();

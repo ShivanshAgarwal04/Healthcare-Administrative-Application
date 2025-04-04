@@ -3,12 +3,15 @@ import java.awt.*;
 import java.sql.*;
 
 // Edit Visit Details
-public class EditVisitDetails extends JFrame {
+public abstract class EditVisitDetails extends JFrame {
     private int bookingID;
     private int prescriptionID;
     private int visitID;
-    private JTextArea notesField;
-    private JTextField medicationField, dosageField, durationField, instructionsField;
+    JTextArea notesField;
+    JTextField medicationField;
+    JTextField dosageField;
+    JTextField durationField;
+    JTextField instructionsField;
 
     // Constructor to initialize with bookingID
     public EditVisitDetails(int bookingID) {
@@ -167,7 +170,7 @@ public class EditVisitDetails extends JFrame {
     }
 
     // Updates both the visit details and prescription details in the database
-    private void updateDetails() {
+    void updateDetails() {
         String notes = notesField.getText();
         String medication = medicationField.getText();
         String dosage = dosageField.getText();
@@ -217,8 +220,10 @@ public class EditVisitDetails extends JFrame {
     }
 
     // confirmation message to the doctor and patient
-    private void sendConfirmationMessage() {
+    void sendConfirmationMessage() {
         // Placeholder for sending confirmation logic
         JOptionPane.showMessageDialog(this, "Confirmation sent to doctor and patient.");
     }
+
+    protected abstract void showMessageDialog(String message);
 }
