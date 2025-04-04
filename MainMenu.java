@@ -10,23 +10,23 @@ public class MainMenu extends JFrame {
     LocalTime currentTime = LocalTime.now();
     private JPanel messagePanel;
     private ArrayList<JTextArea> messages;
-    public Integer doctorID;
 
     public MainMenu() {
         setTitle("Doctor Interface: Main Menu");
-        setSize(400, 500); 
+        setSize(400, 500); // Increased size for better UI spacing and to accommodate the message panel
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); 
+        setLocationRelativeTo(null); // Center the window on the screen
 
         JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridBagLayout()); 
+        panel2.setLayout(new GridBagLayout()); // Improved layout management
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); 
+        gbc.insets = new Insets(5, 5, 5, 5); // Padding for better spacing
+
         messages = new ArrayList<>();
         placeComponents(panel2, gbc);
         add(panel2);
 
-        setVisible(true); 
+        setVisible(true); // Ensure visibility after components are added
     }
 
     private void placeComponents(JPanel panel2, GridBagConstraints gbc) {
@@ -34,10 +34,9 @@ public class MainMenu extends JFrame {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton viewBookings = new JButton("View bookings");
+        JButton viewBookings = new JButton("Bookings");
         viewBookings.setName("viewBookings");
         panel2.add(viewBookings, gbc);
-
 
         gbc.gridy++;
         JButton enterButton = new JButton("Enter Details");
@@ -45,16 +44,11 @@ public class MainMenu extends JFrame {
         panel2.add(enterButton, gbc);
 
         gbc.gridy++;
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.setName("logoutButton");
-        panel2.add(logoutButton, gbc);
-
-        gbc.gridy++;
         JButton messageButton = new JButton("Messaging System");
         messageButton.setName("messageButton");
         panel2.add(messageButton, gbc);
 
-
+        // Adding the new ViewDetails button
         gbc.gridy++;
         JButton viewDetailsButton = new JButton("View Details");
         viewDetailsButton.setName("viewDetailsButton");
@@ -65,7 +59,12 @@ public class MainMenu extends JFrame {
         EditVisitDetailsButton.setName("Edit Visit Details");
         panel2.add(EditVisitDetailsButton, gbc);
 
-      
+        gbc.gridy++;
+        JButton AssignNewDoctorButton = new JButton("Assign New Doctor");
+        AssignNewDoctorButton.setName("Assign New Doctor");
+        panel2.add(AssignNewDoctorButton, gbc);
+
+        // Message Panel (with ScrollPane)
         gbc.gridy++;
         messagePanel = new JPanel();
         messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
@@ -73,7 +72,12 @@ public class MainMenu extends JFrame {
         scrollPane.setPreferredSize(new Dimension(350, 150));
         panel2.add(scrollPane, gbc);
 
-   
+        gbc.gridy++;
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setName("logoutButton");
+        panel2.add(logoutButton, gbc);
+
+        // Add action listeners
         viewBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,7 +110,7 @@ public class MainMenu extends JFrame {
             }
         });
 
-       
+        // Action listener for ViewDetails button
         viewDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -115,18 +119,32 @@ public class MainMenu extends JFrame {
             }
         });
 
-    
+        // Action listener for EditVisitDetails button
         EditVisitDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
- 
+                // Prompt the user to enter the Visit ID
                 String input = JOptionPane.showInputDialog("Enter Visit ID to edit:");
                 try {
-                    int visitID = Integer.parseInt(input); 
-                    new EditVisitDetails(visitID); 
+                    int visitID = Integer.parseInt(input); // Convert the input to an integer
+                    new EditVisitDetails(visitID); // Launch the EditVisitDetails screen with the visitID
                     System.out.println("Opened Edit Visit Details screen for Visit ID " + visitID);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid Visit ID entered.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        AssignNewDoctorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String input = JOptionPane.showInputDialog("Enter Booking Number to assign a new doctor:");
+                try {
+                    int bookingNo = Integer.parseInt(input);
+                    new AssignNewDoctor(bookingNo);
+                    System.out.println("Opened Assign New Doctor screen for Booking No: " + bookingNo + " at " + currentTime);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Invalid Booking Number entered.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
