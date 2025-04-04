@@ -14,10 +14,10 @@ public class AssignNewDoctor extends JFrame {
     public AssignNewDoctor(int bookingNo) {
         this.bookingNo = bookingNo;
 
-        setTitle("Assign New Doctor");
+        setTitle("Assign New Doctor to Patient");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new GridLayout(4, 1, 10, 10));
+        setLayout(new GridLayout(5, 1, 10, 10));
 
         doctorList = new JComboBox<>();
         patientList = new JComboBox<>();
@@ -25,14 +25,13 @@ public class AssignNewDoctor extends JFrame {
         doctorIDs = new ArrayList<>();
         patientIDs = new ArrayList<>();
 
+        add(new JLabel("Select Patient:"));
+        add(patientList);
+        loadPatients();
+
         add(new JLabel("Select New Doctor:"));
         add(doctorList);
         loadDoctors();
-
-        add(new JLabel("Select Patient:"));
-        add(patientList);
-
-        doctorList.addActionListener(e -> loadPatients());
 
         JButton assignButton = new JButton("Assign Doctor");
         assignButton.addActionListener(e -> assignDoctor());
@@ -44,6 +43,7 @@ public class AssignNewDoctor extends JFrame {
     private void loadDoctors() {
         doctorList.removeAllItems();
         doctorIDs.clear();
+
         try (Connection connection = DBConnection.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT doctorID, doctorName FROM Doctors")) {
@@ -62,25 +62,14 @@ public class AssignNewDoctor extends JFrame {
         patientList.removeAllItems();
         patientIDs.clear();
 
-        int selectedDoctorIndex = doctorList.getSelectedIndex();
-        if (selectedDoctorIndex == -1) return;
-
-        int doctorID = doctorIDs.get(selectedDoctorIndex);
-
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(
-                     "SELECT DISTINCT P.patientID, P.patientName " +
-                             "FROM Bookings B JOIN Patients P ON B.patientID = P.patientID " +
-                             "WHERE B.doctorID = ?")) {
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT patientID, patientName FROM Patients")) {
 
-            stmt.setInt(1, doctorID);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    patientIDs.add(rs.getInt("patientID"));
-                    patientList.addItem(rs.getString("patientName"));
-                }
+            while (rs.next()) {
+                patientIDs.add(rs.getInt("patientID"));
+                patientList.addItem(rs.getString("patientName"));
             }
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error loading patients.");
@@ -98,36 +87,53 @@ public class AssignNewDoctor extends JFrame {
 
         int newDoctorID = doctorIDs.get(doctorIndex);
         int patientID = patientIDs.get(patientIndex);
+        int foundBookingNo = -1;
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(
-                     "UPDATE Bookings SET doctorID = ? WHERE bookingNo = ? AND patientID = ?")) {
-
-            stmt.setInt(1, newDoctorID);
-            stmt.setInt(2, bookingNo);
-            stmt.setInt(3, patientID);
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Doctor successfully assigned.");
-                sendConfirmationMessage(newDoctorID, patientID);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update doctor assignment.");
+        try (Connection connection = DBConnection.getConnection()) {
+            // Get the current booking number for this patient
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT bookingNo FROM Bookings WHERE patientID = ?")) {
+                stmt.setInt(1, patientID);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        foundBookingNo = rs.getInt("bookingNo");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "No booking found for this patient.");
+                        return;
+                    }
+                }
             }
+
+            // Update the doctor in the booking
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "UPDATE Bookings SET doctorID = ? WHERE bookingNo = ?")) {
+                stmt.setInt(1, newDoctorID);
+                stmt.setInt(2, foundBookingNo);
+
+                int rows = stmt.executeUpdate();
+                if (rows > 0) {
+                    JOptionPane.showMessageDialog(this, "Doctor reassigned successfully.");
+                    sendConfirmationMessage(connection, foundBookingNo, newDoctorID);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to reassign doctor.");
+                }
+            }
+
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error updating doctor assignment.");
+            JOptionPane.showMessageDialog(this, "Database error during doctor reassignment.");
         }
     }
 
-    private void sendConfirmationMessage(int newDoctorID, int patientID) {
-        try (Connection connection = DBConnection.getConnection()) {
-            String patientName = "", patientEmail = "";
-            String newDoctorName = "", newDoctorEmail = "";
-            String oldDoctorName = "", oldDoctorEmail = "";
+    private void sendConfirmationMessage(Connection connection, int bookingNo, int newDoctorID) {
+        String patientName = "", patientEmail = "";
+        String newDoctorName = "", newDoctorEmail = "";
+        String oldDoctorName = "", oldDoctorEmail = "";
 
+        try {
+            // Get patient and old doctor info
             try (PreparedStatement stmt = connection.prepareStatement(
-                    "SELECT P.patientName, P.email, D.doctorName, D.email " +
+                    "SELECT P.patientName, P.email AS patientEmail, D.doctorName AS oldDocName, D.email AS oldDocEmail " +
                             "FROM Bookings B " +
                             "JOIN Patients P ON B.patientID = P.patientID " +
                             "JOIN Doctors D ON B.doctorID = D.doctorID " +
@@ -136,13 +142,14 @@ public class AssignNewDoctor extends JFrame {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         patientName = rs.getString("patientName");
-                        patientEmail = rs.getString("email");
-                        oldDoctorName = rs.getString("doctorName");
-                        oldDoctorEmail = rs.getString("email");
+                        patientEmail = rs.getString("patientEmail");
+                        oldDoctorName = rs.getString("oldDocName");
+                        oldDoctorEmail = rs.getString("oldDocEmail");
                     }
                 }
             }
 
+            // Get new doctor info
             try (PreparedStatement stmt = connection.prepareStatement(
                     "SELECT doctorName, email FROM Doctors WHERE doctorID = ?")) {
                 stmt.setInt(1, newDoctorID);
@@ -154,6 +161,7 @@ public class AssignNewDoctor extends JFrame {
                 }
             }
 
+            // Simulate sending messages
             JOptionPane.showMessageDialog(this, "Confirmation sent to:\n" +
                     "- Patient: " + patientName + " (" + patientEmail + ")\n" +
                     "- Old Doctor: " + oldDoctorName + " (" + oldDoctorEmail + ")\n" +
@@ -169,4 +177,3 @@ public class AssignNewDoctor extends JFrame {
         SwingUtilities.invokeLater(() -> new AssignNewDoctor(1));
     }
 }
-
