@@ -63,7 +63,7 @@ public class DoctorDashboard extends JFrame {
         System.out.println("Searching for bookings for Doctor: " + this.doctorName); // Debugging
         System.out.println("Year: " + year + ", Month: " + month); // Debugging
 
-        String url = "jdbc:mysql://localhost/dbtest?user=root&password=password";
+        String url = "jdbc:mysql://localhost/testdb?user=root&password=password";
 
         try (Connection conn = DriverManager.getConnection(url)) {
             // Query to match doctorName correctly using a JOIN
