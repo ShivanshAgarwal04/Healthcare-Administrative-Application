@@ -44,7 +44,10 @@ public class AssignNewDoctor extends JFrame {
                 String doctorName = rs.getString("doctorName");
 
                 doctorIDs.add(doctorID);
-                doctorList.addItem(doctorName);
+                doctorList.addItem (doctorName);
+
+                doctorList.revalidate();
+                doctorList.repaint();
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
