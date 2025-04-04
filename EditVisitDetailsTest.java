@@ -33,7 +33,7 @@ public class EditVisitDetailsTest {
         // Initialize with dialog capture
         lastDialogMessage = null;
         editVisitDetails = new EditVisitDetails(123) {
-            @Override
+
             protected void showMessageDialog(String message) {
                 lastDialogMessage = message;
             }
@@ -74,7 +74,7 @@ public class EditVisitDetailsTest {
     @Test
     void loadExistingDetails_HandlesMissingVisit() {
         EditVisitDetails invalid = new EditVisitDetails(999) {
-            @Override
+
             protected void showMessageDialog(String message) {
                 lastDialogMessage = message;
             }
