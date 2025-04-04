@@ -48,22 +48,36 @@ public class DoctorDashboard extends JFrame {
     }
 
     private void viewBookings(String date) {
-        // Extract year and month from input (YYYY-MM)
-        String year = date.substring(0, 4);  // Extract year (YYYY)
-        String month = date.substring(5, 7); // Extract month (MM)
+        // 1. First verify the doctorName value
+        System.out.println("[DEBUG] Current doctorName: '" + this.doctorName + "'");
+        System.out.println("[DEBUG] Date entered: " + date);
 
-        try (Connection conn = DBConnection.getConnection()) {
-            // Query to fetch all bookings matching the year and month
-            String  query = "SELECT dayOfBooking, monthOfBooking, yearOfBooking, bookingTime, " +
-                            "Patients.patientName, Doctors.doctorName " +
-                            "FROM Bookings " +
-                            "JOIN Patients ON Bookings.patientID = Patients.patientID " +
-                            "JOIN Doctors ON Bookings.doctorID = Doctors.doctorID " +
-                            "WHERE yearOfBooking = ? AND monthOfBooking = ?";
+        // 2. Validate date format (YYYY-MM)
+        if (date == null || !date.matches("\\d{4}-\\d{2}")) {
+            bookingsArea.setText("Invalid format. Use YYYY-MM");
+            return;
+
+            String year = date.substring(0, 4);
+        String month = date.substring(5, 7);
+
+        System.out.println("Searching for bookings for Doctor: " + this.doctorName); // Debugging
+        System.out.println("Year: " + year + ", Month: " + month); // Debugging
+
+        String url = "jdbc:mysql://localhost/doctorinterface?user=root&password=password";
+
+        try (Connection conn = DriverManager.getConnection(url)) {
+            // Query to match doctorName correctly using a JOIN
+            String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, b.patientName " +
+                    "FROM bookings b " +
+                    "JOIN doctors d ON b.doctorID = d.doctorID " +
+                    "WHERE b.yearOfBooking = ? AND b.monthOfBooking = ? AND d.doctorName = ?";
 
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, year);
             statement.setString(2, month);
+            statement.setString(3, this.doctorName);
+
+            System.out.println("Executing SQL Query: " + statement.toString()); // Debugging
 
             ResultSet resultSet = statement.executeQuery();
 
@@ -77,28 +91,28 @@ public class DoctorDashboard extends JFrame {
                 String yearOfBooking = resultSet.getString("yearOfBooking");
                 String bookingTime = resultSet.getString("bookingTime");
                 String patientName = resultSet.getString("patientName");
-                String doctorName = resultSet.getString("doctorName");
 
-                // Combining the day, month, and year columns
                 String calendarDate = dayOfBooking + "-" + monthOfBooking + "-" + yearOfBooking;
 
-                // Add the results to the text area
                 bookingsText.append("Date: ").append(calendarDate)
                         .append("\nTime: ").append(bookingTime)
                         .append("\nPatient: ").append(patientName)
-                        .append("\nDoctor: ").append(doctorName)
                         .append("\n------------------\n");
             }
 
             if (found) {
                 bookingsArea.setText(bookingsText.toString());
             } else {
-                bookingsArea.setText("No bookings found for the searched date");
+                bookingsArea.setText("No bookings found for " + doctorName + " in " + date);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            bookingsArea.setText("Error fetching bookings: " + e.getMessage());
+        } catch (StringIndexOutOfBoundsException e) {
+            bookingsArea.setText("Please enter date in YYYY-MM format");
         }
     }
+
 
     public static void main(String[] args) {
         new DoctorDashboard();
