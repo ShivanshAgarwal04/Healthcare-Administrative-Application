@@ -72,25 +72,25 @@ public class LoginScreen extends JFrame {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
-                if (validateLogin(username, password)) {
+                Integer doctorID = DBConnection.getDoctorID(username, password);
+                if (doctorID != -1) { // -1 means login failed
                     JOptionPane.showMessageDialog(LoginScreen.this, "Login Successful!");
 
-                    // Pass the doctor's name to MainMenu
-                    String doctorName = username; // Assuming username = doctorName
-                    new MainMenu(doctorName); // Open MainMenu with the doctor's name
+                    // Open MainMenu with the doctor's ID
+                    new MainMenu(doctorID);
                     dispose(); // Close login screen
                 } else {
                     JOptionPane.showMessageDialog(LoginScreen.this, "Invalid username or password.");
                 }
             }
         });
+
     }
 
     private boolean validateLogin(String username, String password) {
         boolean isValid = false;
-        String url = "jdbc:mysql://localhost/testdb?user=root&password=password";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DBConnection.getConnection()) {
             // Query to retrieve the password for the given username
             String query = "SELECT password FROM doctorCredentials WHERE username = ?";
             PreparedStatement statement = conn.prepareStatement(query);

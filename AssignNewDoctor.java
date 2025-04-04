@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AssignNewDoctor extends JFrame {
+public class AssignNewDoctor extends JFrame {
     private int bookingNo;
     JComboBox<String> doctorList;
     List<Integer> doctorIDs; // Stores doctor IDs for reference
@@ -136,8 +136,7 @@ public abstract class AssignNewDoctor extends JFrame {
 
     // Main method to run the JFrame
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new AssignNewDoctor(123)); // Test with a bookingNo
+
     }
 
-    protected abstract void showMessageDialog(String message);
 }

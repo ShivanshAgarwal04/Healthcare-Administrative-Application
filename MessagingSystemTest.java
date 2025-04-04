@@ -2,8 +2,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,8 +12,13 @@ public class MessagingSystemTest {
 
     // Manual mock implementation of MainMenu
     static class TestMainMenu extends MainMenu {
+        private static final Integer doctorID = 20001; // doctorID for
         public String lastReceivedMessage;
         public boolean wasMessageUpdated = false;
+
+        public TestMainMenu() {
+            super(doctorID);
+        }
 
         @Override
         public void updateMessage(String message) {

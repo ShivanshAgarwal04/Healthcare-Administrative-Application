@@ -11,7 +11,7 @@ public class EditVisitDetailsTest {
     @BeforeAll
     static void setupDatabase() throws SQLException {
 
-        testConnection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+        testConnection = DBConnection.getConnection();
 
 
         try (Statement stmt = testConnection.createStatement()) {

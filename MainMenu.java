@@ -6,13 +6,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class MainMenu extends JFrame {
+    private Integer doctorID;
     private String doctorName;
     LocalTime currentTime = LocalTime.now();
     private JPanel messagePanel;
     private ArrayList<JTextArea> messages;
 
-    public MainMenu(String doctorName) {
-        this.doctorName = doctorName;
+    public MainMenu(Integer doctorID) {
+        String doctorName = DBConnection.getDoctorName(doctorID);
+
         setTitle("Doctor Interface: Main Menu - " + doctorName);
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,7 +82,7 @@ public class MainMenu extends JFrame {
         viewBookings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new DoctorDashboard(doctorName);
+                new DoctorDashboard();
                 System.out.println("Opened Bookings Dashboard for Dr. " + doctorName + " at " + currentTime);
             }
         });
@@ -111,7 +113,7 @@ public class MainMenu extends JFrame {
         EditVisitDetailsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String input = JOptionPane.showInputDialog("Enter Visit ID to edit:");
+                String input = JOptionPane.showInputDialog("Enter Booking ID to edit:");
                 try {
                     int visitID = Integer.parseInt(input);
                     new EditVisitDetails(visitID);
@@ -157,10 +159,5 @@ public class MainMenu extends JFrame {
         messagePanel.add(messageBox);
         messagePanel.revalidate();
         messagePanel.repaint();
-    }
-
-    public static void main(String[] args) {
-        // For testing purposes
-        new MainMenu("TestDoctor");
     }
 }

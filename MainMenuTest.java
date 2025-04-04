@@ -14,7 +14,7 @@ public class MainMenuTest {
     @BeforeEach
     public void setUp() {
         // Initialize the MainMenu frame before each test
-        mainMenu = new MainMenu();
+        mainMenu = new MainMenu(20001);// DoctorID for bob white
     }
 
     @Test

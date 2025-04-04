@@ -6,6 +6,7 @@ import java.sql.*;
 public class DoctorDashboard extends JFrame {
     public JTextField dateField;
     private JTextArea bookingsArea;
+    private String doctorName;
 
     public DoctorDashboard() {
         setTitle("Doctor Dashboard");
@@ -56,16 +57,15 @@ public class DoctorDashboard extends JFrame {
         if (date == null || !date.matches("\\d{4}-\\d{2}")) {
             bookingsArea.setText("Invalid format. Use YYYY-MM");
             return;
-
-            String year = date.substring(0, 4);
+        }
+        String year = date.substring(0, 4);
         String month = date.substring(5, 7);
 
         System.out.println("Searching for bookings for Doctor: " + this.doctorName); // Debugging
         System.out.println("Year: " + year + ", Month: " + month); // Debugging
 
-        String url = "jdbc:mysql://localhost/testdb?user=root&password=password";
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn = DBConnection.getConnection()) {
             // Query to match doctorName correctly using a JOIN
             String query = "SELECT b.dayOfBooking, b.monthOfBooking, b.yearOfBooking, b.bookingTime, b.patientName " +
                     "FROM bookings b " +
@@ -114,7 +114,5 @@ public class DoctorDashboard extends JFrame {
     }
 
 
-    public static void main(String[] args) {
-        new DoctorDashboard();
-    }
+
 }

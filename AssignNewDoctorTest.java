@@ -13,7 +13,7 @@ public class AssignNewDoctorTest {
         private Connection connection;
 
         public TestDatabase() throws SQLException {
-            connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+            connection = DBConnection.getConnection();
             initializeDatabase();
         }
 
@@ -41,7 +41,7 @@ public class AssignNewDoctorTest {
         lastDialogMessage = null;
         assignNewDoctor = new AssignNewDoctor(123) {
             @Override
-            protected void showMessageDialog(String message) {
+            void showMessageDialog(String message) {
                 lastDialogMessage = message;
             }
         };

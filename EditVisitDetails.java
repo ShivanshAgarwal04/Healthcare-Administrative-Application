@@ -3,7 +3,7 @@ import java.awt.*;
 import java.sql.*;
 
 // Edit Visit Details
-public abstract class EditVisitDetails extends JFrame {
+public class EditVisitDetails extends JFrame {
     private int bookingID;
     private int prescriptionID;
     private int visitID;
@@ -225,5 +225,4 @@ public abstract class EditVisitDetails extends JFrame {
         JOptionPane.showMessageDialog(this, "Confirmation sent to doctor and patient.");
     }
 
-    protected abstract void showMessageDialog(String message);
 }
