@@ -136,7 +136,7 @@ public class AssignNewDoctor extends JFrame {
 
     // Main method to run the JFrame
     public static void main(String[] args) {
-
+        SwingUtilities.invokeLater(() -> new AssignNewDoctor(1));
     }
 
 }
