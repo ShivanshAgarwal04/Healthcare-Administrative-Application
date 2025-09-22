@@ -1,4 +1,4 @@
-# Software dev prokect
+# GP Surgery Administrative Interface - Software Development Project
 
 
 
